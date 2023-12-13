@@ -4,3 +4,7 @@ c3d-1.1.0-Linux-gcc64.tar.gz
 
 # Sample data (either provide script to download or point users)
 sample_data/
+sub-P001*
+monai_c3d_implementation/
+preproc_contact_loc/
+preproc_env_2/
