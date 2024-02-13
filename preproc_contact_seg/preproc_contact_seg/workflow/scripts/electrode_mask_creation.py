@@ -15,18 +15,6 @@ from scipy.ndimage import gaussian_filter
 import regex as re
 import csv
 
-imaging_dir = '/home/athurai3/scratch/seeg_data/atlasreg'
-coordinate_dir = '/home/athurai3/scratch/seeg_data/seega_coordinates'
-output_dir = '/home/athurai3/scratch/preproc_contact_seg'
-
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
-
-
-subjects = [identifier for identifier in os.listdir(imaging_dir) if "sub-" in identifier]
-subjects = sorted(subjects)
-
-
 
 def determineFCSVCoordSystem(input_fcsv,overwrite_fcsv=False):
 	# need to determine if file is in RAS or LPS
@@ -198,7 +186,7 @@ def create_electrode_mask(img_path, coord_path, t1_ct_trans, final_path):
         
         test_mask = create_line_mask(pointa, pointb, img_shape)
                 
-        footprint = ball(4)
+        footprint = ball(6)
         dilated = dilation(test_mask, footprint)
         result = gaussian_filter(dilated.astype(float), sigma=0.6)
         final_mask += result>0
@@ -207,34 +195,11 @@ def create_electrode_mask(img_path, coord_path, t1_ct_trans, final_path):
     nib.save(clipped_img, final_path)
 
 
+if __name__ == "__main__":
+    create_electrode_mask(
+        img_path=snakemake.input['znorm_ct'],
+        coord_path = snakemake.input['actual'],
+        t1_ct_trans=snakemake.input['transform_matrix'],
+        final_path=snakemake.output["electrode_mask"],
+    )
 
-#f = open(f'{output_dir}/electrode_mask_creation.txt', "a")
-for subject_id in subjects[20:]:
-    subject_imaging = f'{imaging_dir}/{subject_id}/{subject_id}_ct.nii.gz'
-    subject_planned_coords = f'{coordinate_dir}/{subject_id}/{subject_id}_space-native_planned.fcsv'
-    sub_output_dir = f'{output_dir}/{subject_id}'
-    electrode_mask_path = f'{sub_output_dir}/{subject_id}_space-native_desc-electrode_mask.nii.gz'
-    
-    if not os.path.exists(sub_output_dir):
-        os.makedirs(sub_output_dir)
-        
-    if glob(f'{imaging_dir}/{subject_id}/{subject_id}_desc-affine_from-ct_to-T1w_type-ras_xfm.txt'):
-        affine_matrix = glob(f'{imaging_dir}/{subject_id}/{subject_id}_desc-affine_from-ct_to-T1w_type-ras_xfm.txt')[0]
-        print(subject_id)
-        create_electrode_mask(subject_imaging, subject_planned_coords, affine_matrix, electrode_mask_path)
-        print('Created Electrode Mask')
-        if not glob(electrode_mask_path):
-            print(f'check planned coords for {subject_id}')
-        
-    elif glob(f'{imaging_dir}/{subject_id}/{subject_id}_desc-rigid_from-ct_to-T1w_type-ras_xfm.txt'):
-        rigid_matrix = glob(f'{imaging_dir}/{subject_id}/{subject_id}_desc-rigid_from-ct_to-T1w_type-ras_xfm.txt')[0]
-        print(subject_id)
-        create_electrode_mask(subject_imaging, subject_planned_coords, rigid_matrix, electrode_mask_path)
-        print('Created Electrode Mask')
-        if not glob(electrode_mask_path):
-            print(f'check planned coords for {subject_id}')
-    else:
-        print('missing transform')
-              
-        
-#f.close()

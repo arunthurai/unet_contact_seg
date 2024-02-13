@@ -159,18 +159,52 @@ rule znormalize_ct:
         z_norm_img = z_normalization(input.resampled_ct)
         nib.save(z_norm_img, output.znorm_ct)
 
+
+rule create_electrode_mask:
+    input: 
+        znorm_ct = rules.znormalize_ct.output.znorm_ct,
+        actual = inputs['actual'].path,
+        transform_matrix = get_rigid_or_affine,
+
+    output:
+        electrode_mask = bids(
+            root=config['output_dir'],
+            desc='electrode',
+            res='{res}',
+            suffix='mask.nii.gz',
+            **inputs['affine'].wildcards
+        )
+
+    group: 'subj'
+    
+    container:
+        config["singularity"]["diffparc"]
+    
+    
+    resources:    
+        mem_mb = 32000
+    
+    
+    
+    
+    script: 
+        './scripts/electrode_mask_creation.py'
+
+
+
+
 rule create_patches:
     input:
         znorm_ct = rules.znormalize_ct.output.znorm_ct,
         contact_mask = rules.create_contact_mask.output.contact_mask,
-        electrode_mask = inputs['electrode_mask'].path
+        electrode_mask = rules.create_electrode_mask.output.electrode_mask
         #will update to binary brain mask
     
     params:
         radius_vector = '15x15x15', #patch dimensions will be (x*2)+1 voxels
         n = '2', #sample n randomly augment patches
         angle = '30', #stdev of normal distribution for sampling angle (in degrees)
-        frequency = '500' #sample 1 patch for every n voxels
+        frequency = '1000' #sample 1 patch for every n voxels
 
     output:
         patches = bids(

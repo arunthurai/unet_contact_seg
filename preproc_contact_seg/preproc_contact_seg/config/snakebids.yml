@@ -75,19 +75,16 @@ pybids_inputs:
       - run
     custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_desc-rigid_from-ct_to-T1w_type-ras_xfm.txt'
 
-
-  electrode_mask:
+  actual:
     filters:
-      suffix: 'mask'
-      extension: 'nii.gz'
+      extension: '.fcsv'
     wildcards:
       - subject
       - session
       - acquisition
       - task
       - run
-    custom_path: '/scratch/athurai3/preproc_contact_seg/sub-{subject}/sub-{subject}_space-native_desc-electrode_mask.nii.gz'
-
+    custom_path: '/scratch/athurai3/seeg_data/seega_coordinates/sub-{subject}/sub-{subject}_space-native_actual.fcsv'
 
 #configuration for the command-line parameters to make available
 # passed on the argparse add_argument()
