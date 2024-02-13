@@ -1,0 +1,191 @@
+#---- begin snakebids boilerplate ----------------------------------------------
+
+from snakebids import bids, generate_inputs, get_wildcard_constraints
+import nibabel as nib
+import numpy as np
+
+configfile: workflow.source_path('../config/snakebids.yml')
+
+# Get input wildcards
+inputs = generate_inputs(
+    bids_dir=config["bids_dir"],
+    pybids_inputs=config["pybids_inputs"],
+    pybidsdb_dir=config.get("pybidsdb_dir"),
+    pybidsdb_reset=config.get("pybidsdb_reset"),
+    derivatives=config.get("derivatives", None),
+    participant_label=config.get("participant_label", None),
+    exclude_participant_label=config.get("exclude_participant_label", None),
+    validate=not config.get("plugins.validator.skip", False)
+)
+
+#this adds constraints to the bids naming
+wildcard_constraints:  **get_wildcard_constraints(config['pybids_inputs'])
+
+#---- end snakebids boilerplate ------------------------------------------------
+
+#take union of affine and rigid
+affine_rigid_subjects = set(inputs['affine'].zip_lists['subject']) | set(inputs['rigid'].zip_lists['subject'])
+
+#intersect with other sets of subjects
+subjects = affine_rigid_subjects & set(inputs['ct'].zip_lists['subject']) & set(inputs['landmarks_ct'].zip_lists['subject'])
+
+print(subjects)
+
+rule all:
+    input:
+        patches = expand(bids(
+            root=config['output_dir'],
+            suffix='patches.dat',
+            res='{res}',
+            **inputs['affine'].wildcards),
+                subject=subjects,
+                res=config['res_mm'])
+        
+rule resample:
+    input:
+        orig_ct =  inputs['ct'].path
+    
+    params:
+        interpolation = 'Cubic',
+        dims = '{res}x{res}x{res}mm'
+    
+    output:
+        resampled_ct = bids(
+            root=config['output_dir'],
+            res='{res}',
+            suffix='ct.nii.gz',
+            subject = '{subject}'
+        )
+
+    group: 'subj'
+    
+    container:
+        config["singularity"]["diffparc"]
+
+    shell: 'c3d {input.orig_ct} -interpolation {params.interpolation} -resample-mm {params.dims} -o {output.resampled_ct}'
+
+
+def get_rigid_or_affine(wildcards):
+    #have the subject id (wildcards.subject)
+    #want to pick either rigid or affine, depending on which zip list contains the subject
+    if wildcards.subject in inputs['affine'].zip_lists['subject']:
+        return inputs['affine'].path
+    elif wildcards.subject in inputs['rigid'].zip_lists['subject']:
+        return inputs['rigid'].path
+    else:
+        print('subject has neither affine or rigid!')
+        
+
+rule transform_points_ct:
+    input: 
+        orig_point = inputs['landmarks_ct'].path,
+        aff = get_rigid_or_affine
+    
+    output:
+        transformed_txt = bids(
+            root=config['output_dir'],
+            space = 'native_ct',
+            suffix='landmarks.txt',
+            **inputs['affine'].wildcards
+        )
+    
+    group: 'subj'
+
+    run:
+        import numpy as np
+        affine = np.loadtxt(input.aff)
+        points = np.loadtxt(input.orig_point).T
+        transformed_points = affine @ points
+        np.savetxt(output.transformed_txt, transformed_points.T, fmt='%f')
+
+rule create_contact_mask:
+    input: 
+        landmarks = rules.transform_points_ct.output.transformed_txt,
+        resampled_ct = rules.resample.output.resampled_ct
+
+    output:
+        contact_mask = bids(
+            root=config['output_dir'],
+            desc='contacts',
+            res='{res}',
+            suffix='mask.nii.gz',
+            **inputs['affine'].wildcards
+        )
+
+    group: 'subj'
+    
+    container:
+        config["singularity"]["diffparc"]
+    
+    shell: 'c3d {input.resampled_ct} -scale 0 -landmarks-to-spheres {input.landmarks} 1 -o {output.contact_mask}'
+
+rule znormalize_ct:
+    input:
+        resampled_ct = rules.resample.output.resampled_ct,
+    
+    output:
+        znorm_ct = bids(
+            root = config["output_dir"],
+            res='{res}',
+            desc='z_norm',
+            suffix='ct.nii.gz',
+            **inputs['affine'].wildcards
+        )
+
+    resources:    
+        mem_mb = 10000
+
+    group: 'subj'
+
+    run:
+        import numpy as np
+        import nibabel as nib
+        def read_nii_metadata(nii_path):
+            """Load in nifti data and header information"""
+            nii = nib.load(nii_path)
+            nii_affine = nii.affine
+            nii_data = nii.get_fdata()
+            nii_header = nii.header
+            return nii_affine, nii_data, nii_header
+
+        def z_normalization(nii_path):
+            aff, nii_img, head = read_nii_metadata(nii_path)
+            img_stdev = np.std(nii_img)
+            img_mean = np.mean(nii_img)
+            z_norm = (nii_img - img_mean)/img_stdev
+            new_img = nib.Nifti1Image(z_norm, aff, head)
+            return new_img
+        
+        z_norm_img = z_normalization(input.resampled_ct)
+        nib.save(z_norm_img, output.znorm_ct)
+
+rule create_patches:
+    input:
+        znorm_ct = rules.znormalize_ct.output.znorm_ct,
+        contact_mask = rules.create_contact_mask.output.contact_mask,
+        electrode_mask = inputs['electrode_mask'].path
+        #will update to binary brain mask
+    
+    params:
+        radius_vector = '15x15x15', #patch dimensions will be (x*2)+1 voxels
+        n = '2', #sample n randomly augment patches
+        angle = '30', #stdev of normal distribution for sampling angle (in degrees)
+        frequency = '500' #sample 1 patch for every n voxels
+
+    output:
+        patches = bids(
+            root=config['output_dir'],
+            suffix='patches.dat',
+            res='{res}',
+            **inputs['affine'].wildcards
+        )
+
+    resources:    
+        mem_mb = 10000
+    
+    #group: 'subj'
+
+    container:
+        config["singularity"]["diffparc"]
+
+    shell: 'c3d {input.znorm_ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches} {params.radius_vector} {params.frequency}'

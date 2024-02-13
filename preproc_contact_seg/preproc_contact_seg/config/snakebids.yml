@@ -1,0 +1,154 @@
+bids_dir: 'unused'
+output_dir: '/projects/ctb-akhanf/athurai3/unet_contact_seg/preproc_results'
+
+#enable printing debug statements during parsing -- disable if generating dag visualization
+debug: False
+
+derivatives: False #will search in bids/derivatives if True; can also be path(s) to derivatives datasets
+
+#list of analysis levels in the bids app
+analysis_levels: &analysis_levels
+ - participant
+
+
+#mapping from analysis_level to set of target rules or files
+targets_by_analysis_level:
+  participant:
+    - ''  # if '', then the first rule is run
+
+#this configures the pybids grabber - create an entry for each type of input you want to grab
+# indexed by name of input
+#   dictionary for each input is passed directly to pybids get()
+#    https://bids-standard.github.io/pybids/generated/bids.layout.BIDSLayout.html#bids.layout.BIDSLayout.get
+
+res_mm:
+  - '0.5'
+
+pybids_inputs:
+  ct:
+    filters:
+      suffix: 'ct'
+      extension: 'nii.gz'
+      space: False
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - task
+      - run
+    custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_ct.nii.gz'
+
+  landmarks_ct:
+    filters:
+      suffix: 'landmarks'
+      extension: '.txt'
+      space: True
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - task
+      - run
+    custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_space-ct_landmarks.txt'
+
+  affine:
+    filters:
+      suffix: 'xfm'
+      extension: '.txt'
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - task
+      - run
+    custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_desc-affine_from-ct_to-T1w_type-ras_xfm.txt'
+
+  rigid:
+    filters:
+      suffix: 'xfm'
+      extension: '.txt'
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - task
+      - run
+    custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_desc-rigid_from-ct_to-T1w_type-ras_xfm.txt'
+
+
+  electrode_mask:
+    filters:
+      suffix: 'mask'
+      extension: 'nii.gz'
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - task
+      - run
+    custom_path: '/scratch/athurai3/preproc_contact_seg/sub-{subject}/sub-{subject}_space-native_desc-electrode_mask.nii.gz'
+
+
+#configuration for the command-line parameters to make available
+# passed on the argparse add_argument()
+parse_args:
+
+#---  core BIDS-app options --- (do not modify below)
+
+  bids_dir:
+    help: The directory with the input dataset formatted according
+          to the BIDS standard.
+
+  output_dir:
+    help: The directory where the output files
+          should be stored. If you are running group level analysis
+          this folder should be prepopulated with the results of the
+          participant level analysis.
+
+  analysis_level:
+    help: Level of the analysis that will be performed.
+    choices: *analysis_levels
+
+  --participant_label:
+    help: The label(s) of the participant(s) that should be analyzed. The label
+          corresponds to sub-<participant_label> from the BIDS spec
+          (so it does not include "sub-"). If this parameter is not
+          provided all subjects should be analyzed. Multiple
+          participants can be specified with a space separated list.
+    nargs: '+'
+
+  --exclude_participant_label:
+    help: The label(s) of the participant(s) that should be excluded. The label
+          corresponds to sub-<participant_label> from the BIDS spec
+          (so it does not include "sub-"). If this parameter is not
+          provided all subjects should be analyzed. Multiple
+          participants can be specified with a space separated list.
+    nargs: '+'
+
+  --derivatives:
+    help: 'Path(s) to a derivatives dataset, for folder(s) that contains multiple derivatives datasets (default: %(default)s) '
+    default: False
+    nargs: '+'
+
+
+ # custom command-line parameters can then be added, these will get added to the config and also accessible to plugins
+ # below are examples for plugin and custom parameters (e.g. config['smoothing_fwhm'])
+  --skip_bids_validation:
+    help: 'Skip validation of BIDS dataset. BIDS validation is performed by
+          default using the bids-validator plugin (if installed/enabled) or with the pybids 
+          validator implementation (if bids-validator is not installed/enabled).'
+    dest: "plugins.validator.skip"
+    action: "store_true"
+    default: False
+
+  --smoothing_fwhm:
+    nargs: '+'
+    required: True
+
+
+#--- workflow specific configuration -- below is just an example:
+
+
+#singularity containers
+singularity:
+    diffparc: '/project/ctb-akhanf/akhanf/singularity/bids-apps/khanlab_diffparc-deps_v0.1.0-fix.sif'

@@ -1,0 +1,7 @@
+Building DAG of jobs...
+MissingInputException in rule create_patches in file /project/6050199/athurai3/unet_contact_seg/preproc_contact_seg/preproc_contact_seg/workflow/Snakefile, line 162:
+Missing input files for rule create_patches:
+    output: /projects/ctb-akhanf/athurai3/unet_contact_seg/preproc_results/sub-P083/sub-P083_res-0.5_patches.dat
+    wildcards: subject=P083, res=0.5
+    affected files:
+        /scratch/athurai3/preproc_contact_seg/sub-P083/sub-P083_space-native_desc-electrode_mask.nii.gz
