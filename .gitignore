@@ -7,6 +7,9 @@ sample_data/
 sub-P001*
 sub-P002*
 electrode_masks/
+.ipynb_checkpoints/
+monai_c3d_implementation/.ipynb_checkpoints/
 .ipynb_checkpoints/*
+monai_c3d_implementation/.ipynb_checkpoints/*
 preproc_contact_seg/preproc_contact_seg/.venv/
 
