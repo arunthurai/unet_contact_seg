@@ -4,7 +4,7 @@ from snakebids import bids, generate_inputs, get_wildcard_constraints
 import nibabel as nib
 import numpy as np
 
-configfile: workflow.source_path('../config/snakebids.yml')
+configfile: 'config/snakebids.yml'
 
 # Get input wildcards
 inputs = generate_inputs(

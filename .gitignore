@@ -6,10 +6,7 @@ c3d-1.1.0-Linux-gcc64.tar.gz
 sample_data/
 sub-P001*
 sub-P002*
-keras*
 electrode_masks/
-preproc_results/
-demo*
-Contact_segmentation.ipynb
 .ipynb_checkpoints/*
-clustering_approach/
+preproc_contact_seg/preproc_contact_seg/.venv/
+

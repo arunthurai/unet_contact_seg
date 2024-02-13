@@ -143,7 +143,6 @@ parse_args:
 
   --smoothing_fwhm:
     nargs: '+'
-    required: True
 
 
 #--- workflow specific configuration -- below is just an example:
