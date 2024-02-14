@@ -47,7 +47,7 @@ rule resample:
     
     params:
         interpolation = 'Cubic',
-        dims = '{res}x{res}x{res}mm'
+        dims = '0.5x0.5x0.5mm'
     
     output:
         resampled_ct = bids(
@@ -137,27 +137,8 @@ rule znormalize_ct:
 
     group: 'subj'
 
-    run:
-        import numpy as np
-        import nibabel as nib
-        def read_nii_metadata(nii_path):
-            """Load in nifti data and header information"""
-            nii = nib.load(nii_path)
-            nii_affine = nii.affine
-            nii_data = nii.get_fdata()
-            nii_header = nii.header
-            return nii_affine, nii_data, nii_header
-
-        def z_normalization(nii_path):
-            aff, nii_img, head = read_nii_metadata(nii_path)
-            img_stdev = np.std(nii_img)
-            img_mean = np.mean(nii_img)
-            z_norm = (nii_img - img_mean)/img_stdev
-            new_img = nib.Nifti1Image(z_norm, aff, head)
-            return new_img
-        
-        z_norm_img = z_normalization(input.resampled_ct)
-        nib.save(z_norm_img, output.znorm_ct)
+    script: 
+        './scripts/znormalize_ct.py'
 
 
 rule create_electrode_mask:
@@ -176,16 +157,9 @@ rule create_electrode_mask:
         )
 
     group: 'subj'
-    
-    container:
-        config["singularity"]["diffparc"]
-    
-    
+
     resources:    
         mem_mb = 32000
-    
-    
-    
     
     script: 
         './scripts/electrode_mask_creation.py'
@@ -215,9 +189,9 @@ rule create_patches:
         )
 
     resources:    
-        mem_mb = 10000
+        mem_mb = 32000
     
-    #group: 'subj'
+    group: 'subj'
 
     container:
         config["singularity"]["diffparc"]

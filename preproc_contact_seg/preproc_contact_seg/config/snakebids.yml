@@ -22,7 +22,7 @@ targets_by_analysis_level:
 #    https://bids-standard.github.io/pybids/generated/bids.layout.BIDSLayout.html#bids.layout.BIDSLayout.get
 
 res_mm:
-  - '0.5'
+  - '0p5mm'
 
 pybids_inputs:
   ct:
