@@ -54,8 +54,12 @@ from monai.apps import download_and_extract
 import matplotlib.pyplot as plt
 
 
-# In[2]:
 
+
+date="Feb14" #  put current date if training, test if just testing
+
+if not os.path.exists(f'/home/athurai3/scratch/monai_outputs/UNET/{date}'):
+    os.makedirs(f'/home/athurai3/scratch/monai_outputs/UNET/{date}')
 
 #hyperparameters
 batch_size = 2 #image data gen to read array generator from c3d*
@@ -83,28 +87,28 @@ dims = 1+2*radius
 # In[3]:
 
 
-fname = '/home/athurai3/projects/ctb-akhanf/athurai3/unet_contact_seg/sample_data/sub-P001/sub-P001_desc-znorm_patches.dat'
+fname = 'scratch/preproc_outputs/train_data/train_patches.dat'
 bps = 4 * num_channels * np.prod(dims)         # Bytes per sample
 file_size = os.path.getsize(fname) 
-num_samples = np.floor_divide(file_size,bps)   # Number of samples
+num_samples_tr = np.floor_divide(file_size,bps)   # Number of samples
 print(file_size)
 print(bps)
-print(num_samples)
+print(num_samples_tr)
 
 
 #can change first index from num_samples to try with training on smaller number of jobs, kjupyter job
 dims = dims.astype('int')
-arr_shape_train = (num_samples, dims[0],dims[1],dims[2],num_channels)
+arr_shape_train = (num_samples_tr, dims[0],dims[1],dims[2],num_channels)
 
 arr_train = np.memmap(fname,'float32','r',shape=arr_shape_train)
 #arr_train = np.swapaxes(arr_train,1,3)
-print(arr_shape_train)
+print(f'Training Array Shape: {arr_shape_train}')
 
 
 # In[5]:
 
 
-fname_val = '/home/athurai3/projects/ctb-akhanf/athurai3/unet_contact_seg/sample_data/sub-P002/sub-P002_desc-znorm_patches.dat'
+fname_val = 'scratch/preproc_outputs/val_data/val_patches.dat'
 
 bps = 4 * num_channels * np.prod(dims)         # Bytes per sample
 file_size_val = os.path.getsize(fname_val) 
@@ -120,7 +124,7 @@ arr_shape_val = (num_samples_val,dims[0],dims[1],dims[2],num_channels)
 
 arr_val = np.memmap(fname_val,'float32','r',shape=arr_shape_val)
 #arr_val = np.swapaxes(arr_val,1,3)
-print(arr_shape_val)
+print(f'Validation Array Shape: {arr_shape_val}')
 
 
 # In[6]:
@@ -177,15 +181,20 @@ validate_patches_dataset = CacheDataset(data=arr_val_dict, transform = val_trans
 
 
 batch_size = 32
-training_steps = int(num_samples / batch_size) # number of training steps per epoch
+training_steps = int(num_samples_tr / batch_size) # number of training steps per epoch
+print(f'Training Steps', training_steps)
 validation_steps = int(num_samples_val/ batch_size) # number of validation steps per epoch
+print('Validation Steps', validation_steps)
 
 
 # In[12]:
 
 
-train_loader = DataLoader(train_patches_dataset, batch_size=batch_size, shuffle=False, num_workers=2) #num_workers is number of cpus we request
-val_loader = DataLoader(validate_patches_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+train_loader = DataLoader(train_patches_dataset, batch_size=batch_size, shuffle=True, num_workers=2) #num_workers is number of cpus we request
+val_loader = DataLoader(validate_patches_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+
+print(len(train_loader))
+print(len(val_loader))
 
 
 # In[13]:
@@ -264,25 +273,20 @@ class EarlyStopping:
 
 
 import time
-#from pytorchtools import EarlyStopping
+patience = 100
+early_stopping = EarlyStopping(patience = patience, verbose = True, path = f'scratch/monai_outputs/UNET/{date}/checkpoint.pt')
 
-date = '2024Feb5'
 start = time.time() # initializing variable to calculate training time
 
-
-from monai.transforms import Activations, Activationsd, AsDiscrete, AsDiscreted, EnsureTyped, SaveImaged
-
-
 val_interval = 2
-best_metric = -1
-best_metric_epoch = -1
-max_epochs = 750
+max_epochs = 2000
 epoch_loss_values = [0]
 val_dice_metric_values = [0]
 val_loss_values = [0]
+
 post_transforms = Compose(
     [
-        Activations(sigmoid=True),
+        Activations(sigmoid = True),
         AsDiscrete(threshold = 0.5),
         #SaveImaged(keys="pred", meta_keys="pred_meta_dict", output_dir=monai_test_dir, resample=False),
     ]
@@ -297,69 +301,72 @@ for epoch in range(max_epochs):
         count=max_epochs, 
         desc = f"epoch {epoch+1}, training loss: {epoch_loss_values[-1]:.4f}, validation metric: {val_dice_metric_values[-1]:.4f}, validation loss: {val_loss_values[-1]:.4f}",
         newline = True)
-    step = 0
-    for batch_data in train_loader:
-        step +=1
+    
+    for i, batch_data in enumerate(train_loader):
         images = batch_data["image"].cuda()
         labels = batch_data["label"].cuda()
+        
         optimizer.zero_grad()
+        
         outputs = model(images)
+        
         loss = loss_function(outputs, labels)
         loss.backward()
         optimizer.step()
+        
         epoch_loss += loss.item()
         epoch_len = len(train_patches_dataset) // train_loader.batch_size
-        print(f"{step}/{epoch_len}, train_loss: {loss.item():.4f}")
+        print(f"{i}/{epoch_len}, train_loss: {loss.item():.4f}")
     
-    epoch_loss /= step
-    epoch_loss_values.append(epoch_loss)
-    print(f"epoch {epoch + 1} average loss: {epoch_loss:.4f}")
+    avg_training_loss = epoch_loss/len(train_loader)
+    epoch_loss_values.append(avg_training_loss)
+    
+    print(f"epoch {epoch + 1} average loss: {avg_training_loss:.4f}")
 
     
     if (epoch + 1) % val_interval == 0:
         model.eval()
     
-        with torch.no_grad():
-            avg_val_loss = 0
+        with torch.inference_mode():
+            
+            epoch_val_loss = 0
+            
             val_images = None
             val_labels = None
             val_outputs = None
-            for batch_valdata in val_loader:
+            
+            for i, batch_valdata in enumerate(val_loader):
                 val_images, val_labels = (batch_valdata["image"].cuda(), batch_valdata["label"].cuda())
+                
                 #sliding window size and batch size for inference
                 roi_size = (32, 32, 32)
                 sw_batch_size = 32
                 val_outputs = sliding_window_inference(val_images, roi_size, sw_batch_size, model)
-                #val_outputs = sliding_window_inference(val_images, roi_size, sw_batch_size, model)
-                #batch_valdata['label'] = val_labels
-            
-                #val_outputs = post_transforms(i) for i in decollate_batch(val_outputs)]
                 val_outputs = post_transforms(val_outputs)
-                print(torch.unique(val_outputs))
+                
+                #print(f'Unique Values of Prediction Tensor: {torch.unique(val_outputs)}')
+                #print(f'Unique Values of Label Tensor: {torch.unique(val_labels)}')
+                
                 dice_metric(y_pred = val_outputs, y = val_labels)
-                #metric_count += len(value)
-                #metric_sum += value.item() * len(value)
                 
                 val_loss = loss_function(val_outputs, val_labels)
-                avg_val_loss += val_loss.item()
+                epoch_val_loss += val_loss.item()
+                epoch_val_len = len(validate_patches_dataset) // val_loader.batch_size
             
-            avg_val_loss = avg_val_loss.item()/validation_steps
+            avg_val_loss = epoch_val_loss/len(val_loader)
             val_loss_values.append(avg_val_loss)
+            
             metric = dice_metric.aggregate().item()
             dice_metric.reset()
             val_dice_metric_values.append(metric)
             
-            print(f'Validation Metric: {metric}')
-            if metric > best_metric:
-                best_metric = metric
-                best_metric_epoch = epoch + 1
-                torch.save(model.state_dict(), f'/home/athurai3/scratch/seeg_contacts_loc/derivatives/UNET/{date}_diceloss_checkpoint.pt')
-                print("saved new best metric model")
-            print(
-                "current epoch: {} current mean dice: {:.4f} best mean dice: {:.4f} at epoch {}".format(
-                    epoch + 1, metric, best_metric, best_metric_epoch
-                )
-            )
+            early_stopping(avg_val_loss, model)
+            
+            if early_stopping.early_stop:
+                print("Early Stopping")
+                break
+            
+
 
 end = time.time()
 time = end - start
@@ -369,10 +376,10 @@ print(time)
 # In[ ]:
 
 
-with open (f'/home/athurai3/scratch/seeg_contacts_loc/derivatives/UNET/{date}_dicelossmodel_stats.txt', 'w') as file:  
+with open (f'/home/athurai3/scratch/monai_outputs/UNET/{date}/dicelossmodel_stats.txt', 'w') as file:  
     file.write(f'training time: {time}\n')  
-    file.write(f'training loss: {epoch_loss_values[:]}')#\n validation loss: {early_stopping.val_loss_min}\n')
-    file.write(f'validation dice metric: {val_dice_metric_values[:]}')
+    file.write(f'training loss: {epoch_loss_values[-patience]}\n validation loss: {early_stopping.val_loss_min}\n')
+    file.write(f'validation dice metric: {val_dice_metric_values[-patience]}')
 
 
 # In[ ]:
@@ -380,7 +387,7 @@ with open (f'/home/athurai3/scratch/seeg_contacts_loc/derivatives/UNET/{date}_di
 
 plt.figure(figsize=(14,8))
 plt.plot(list(range(len(epoch_loss_values))), epoch_loss_values, label="Training Loss")
-#plt.plot(list(range(len(val_loss_values))), val_loss_values , label="Validation Loss")
+plt.plot(list(range(len(val_loss_values))), val_loss_values , label="Validation Loss")
 plt.grid(True, "both", "both")
 plt.legend()
-plt.savefig(f'/home/athurai3/scratch/seeg_contacts_loc/derivatives/UNET/{date}_dicelossfunction.png')
+plt.savefig(f'/home/athurai3/scratch/monai_outputs/UNET/{date}/dicelossfunction.png')

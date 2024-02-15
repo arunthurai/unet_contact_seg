@@ -56,10 +56,10 @@ import matplotlib.pyplot as plt
 
 
 
-date="Feb9" #  put current date if training, test if just testing
+date="Feb14" #  put current date if training, test if just testing
 
-if not os.path.exists(f'/home/athurai3/scratch/monai_outputs/UNET/{date}'):
-    os.makedirs(f'/home/athurai3/scratch/monai_outputs/UNET/{date}')
+if not os.path.exists(f'/scratch/athurai3/monai_outputs/UNET/{date}'):
+    os.makedirs(f'/scratch/athurai3/monai_outputs/UNET/{date}')
 
 #hyperparameters
 batch_size = 2 #image data gen to read array generator from c3d*
@@ -87,7 +87,7 @@ dims = 1+2*radius
 # In[3]:
 
 
-fname = '/home/athurai3/projects/ctb-akhanf/athurai3/unet_contact_seg/sample_data/sub-P001/sub-P001_desc-znorm_patches.dat'
+fname = '/scratch/athurai3/preproc_outputs/train_data/train_patches.dat'
 bps = 4 * num_channels * np.prod(dims)         # Bytes per sample
 file_size = os.path.getsize(fname) 
 num_samples_tr = np.floor_divide(file_size,bps)   # Number of samples
@@ -108,7 +108,7 @@ print(f'Training Array Shape: {arr_shape_train}')
 # In[5]:
 
 
-fname_val = '/home/athurai3/projects/ctb-akhanf/athurai3/unet_contact_seg/sample_data/sub-P002/sub-P002_desc-znorm_patches.dat'
+fname_val = '/scratch/athurai3/preproc_outputs/val_data/val_patches.dat'
 
 bps = 4 * num_channels * np.prod(dims)         # Bytes per sample
 file_size_val = os.path.getsize(fname_val) 
@@ -273,13 +273,13 @@ class EarlyStopping:
 
 
 import time
-patience = 50
-early_stopping = EarlyStopping(patience = patience, verbose = True, path = f'/home/athurai3/scratch/monai_outputs/UNET/{date}/checkpoint.pt')
+patience = 100
+early_stopping = EarlyStopping(patience = patience, verbose = True, path = f'scratch/monai_outputs/UNET/{date}/checkpoint.pt')
 
 start = time.time() # initializing variable to calculate training time
 
 val_interval = 2
-max_epochs = 500
+max_epochs = 2000
 epoch_loss_values = [0]
 val_dice_metric_values = [0]
 val_loss_values = [0]
@@ -376,7 +376,7 @@ print(time)
 # In[ ]:
 
 
-with open (f'/home/athurai3/scratch/monai_outputs/UNET/{date}/dicelossmodel_stats.txt', 'w') as file:  
+with open (f'/scratch/athurai3/monai_outputs/UNET/{date}/dicelossmodel_stats.txt', 'w') as file:  
     file.write(f'training time: {time}\n')  
     file.write(f'training loss: {epoch_loss_values[-patience]}\n validation loss: {early_stopping.val_loss_min}\n')
     file.write(f'validation dice metric: {val_dice_metric_values[-patience]}')
@@ -390,4 +390,4 @@ plt.plot(list(range(len(epoch_loss_values))), epoch_loss_values, label="Training
 plt.plot(list(range(len(val_loss_values))), val_loss_values , label="Validation Loss")
 plt.grid(True, "both", "both")
 plt.legend()
-plt.savefig(f'/home/athurai3/scratch/monai_outputs/UNET/{date}/dicelossfunction.png')
+plt.savefig(f'/scratch/athurai3/monai_outputs/UNET/{date}/dicelossfunction.png')
