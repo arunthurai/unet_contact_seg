@@ -337,6 +337,11 @@ for epoch in range(max_epochs):
             
             for i, batch_valdata in enumerate(val_loader):
                 val_images, val_labels = (batch_valdata["image"].cuda(), batch_valdata["label"].cuda())
+
+                # First update loss
+                outputs = model(val_images)
+                val_loss = loss_function(outputs, val_labels)
+                epoch_val_loss += val_loss.item()
                 
                 #sliding window size and batch size for inference
                 roi_size = (32, 32, 32)
@@ -348,10 +353,6 @@ for epoch in range(max_epochs):
                 #print(f'Unique Values of Label Tensor: {torch.unique(val_labels)}')
                 
                 dice_metric(y_pred = val_outputs, y = val_labels)
-                
-                val_loss = loss_function(val_outputs, val_labels)
-                epoch_val_loss += val_loss.item()
-                epoch_val_len = len(validate_patches_dataset) // val_loader.batch_size
             
             avg_val_loss = epoch_val_loss/len(val_loader)
             val_loss_values.append(avg_val_loss)
