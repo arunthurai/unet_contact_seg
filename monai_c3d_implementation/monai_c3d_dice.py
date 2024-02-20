@@ -56,7 +56,7 @@ import matplotlib.pyplot as plt
 
 
 
-date="Feb14" #  put current date if training, test if just testing
+date="Feb19" #  put current date if training, test if just testing
 
 if not os.path.exists(f'/scratch/athurai3/monai_outputs/UNET/{date}'):
     os.makedirs(f'/scratch/athurai3/monai_outputs/UNET/{date}')
@@ -205,10 +205,10 @@ model = UNet(
     spatial_dims=3,
     in_channels=1,
     out_channels=1,
-    channels=(16, 32, 64, 128, 256),
+    channels=(64, 128, 256, 512),
     strides=(2, 2, 2, 2),
     num_res_units=2,
-    dropout = 0.4,
+    dropout = 0.2,
     norm=Norm.BATCH,
 ).to(device)
 loss_function = DiceCELoss(sigmoid = True) #revisit
@@ -273,13 +273,16 @@ class EarlyStopping:
 
 
 import time
-patience = 100
-early_stopping = EarlyStopping(patience = patience, verbose = True, path = f'scratch/monai_outputs/UNET/{date}/checkpoint.pt')
+patience = 20
+early_stopping = EarlyStopping(patience = patience, 
+                               verbose = True,
+                               delta = 0.001, 
+                               path = f'scratch/monai_outputs/UNET/{date}/checkpoint.pt')
 
 start = time.time() # initializing variable to calculate training time
 
 val_interval = 2
-max_epochs = 2000
+max_epochs = 1000
 epoch_loss_values = [0]
 val_dice_metric_values = [0]
 val_loss_values = [0]

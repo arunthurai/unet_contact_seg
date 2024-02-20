@@ -56,10 +56,10 @@ import matplotlib.pyplot as plt
 
 
 
-date="Feb14" #  put current date if training, test if just testing
+date="Feb19" #  put current date if training, test if just testing
 
-if not os.path.exists(f'/home/athurai3/scratch/monai_outputs/UNET/{date}'):
-    os.makedirs(f'/home/athurai3/scratch/monai_outputs/UNET/{date}')
+if not os.path.exists(f'/scratch/athurai3/monai_outputs/UNET/{date}'):
+    os.makedirs(f'/scratch/athurai3/monai_outputs/UNET/{date}')
 
 #hyperparameters
 batch_size = 2 #image data gen to read array generator from c3d*
@@ -87,7 +87,7 @@ dims = 1+2*radius
 # In[3]:
 
 
-fname = 'scratch/preproc_outputs/train_data/train_patches.dat'
+fname = '/scratch/athurai3/preproc_outputs/train_data/train_patches.dat'
 bps = 4 * num_channels * np.prod(dims)         # Bytes per sample
 file_size = os.path.getsize(fname) 
 num_samples_tr = np.floor_divide(file_size,bps)   # Number of samples
@@ -108,7 +108,7 @@ print(f'Training Array Shape: {arr_shape_train}')
 # In[5]:
 
 
-fname_val = 'scratch/preproc_outputs/val_data/val_patches.dat'
+fname_val = '/scratch/athurai3/preproc_outputs/val_data/val_patches.dat'
 
 bps = 4 * num_channels * np.prod(dims)         # Bytes per sample
 file_size_val = os.path.getsize(fname_val) 
@@ -205,10 +205,10 @@ model = UNet(
     spatial_dims=3,
     in_channels=1,
     out_channels=1,
-    channels=(16, 32, 64, 128, 256),
+    channels=(64, 128, 256, 512),
     strides=(2, 2, 2, 2),
     num_res_units=2,
-    dropout = 0.4,
+    dropout = 0,
     norm=Norm.BATCH,
 ).to(device)
 loss_function = DiceCELoss(sigmoid = True) #revisit
@@ -273,13 +273,16 @@ class EarlyStopping:
 
 
 import time
-patience = 100
-early_stopping = EarlyStopping(patience = patience, verbose = True, path = f'scratch/monai_outputs/UNET/{date}/checkpoint.pt')
+patience = 20
+early_stopping = EarlyStopping(patience = patience, 
+                               verbose = True,
+                               delta = 0.001, 
+                               path = f'scratch/monai_outputs/UNET/{date}/checkpoint.pt')
 
 start = time.time() # initializing variable to calculate training time
 
 val_interval = 2
-max_epochs = 2000
+max_epochs = 1000
 epoch_loss_values = [0]
 val_dice_metric_values = [0]
 val_loss_values = [0]
@@ -337,6 +340,11 @@ for epoch in range(max_epochs):
             
             for i, batch_valdata in enumerate(val_loader):
                 val_images, val_labels = (batch_valdata["image"].cuda(), batch_valdata["label"].cuda())
+
+                # First update loss
+                outputs = model(val_images)
+                val_loss = loss_function(outputs, val_labels)
+                epoch_val_loss += val_loss.item()
                 
                 #sliding window size and batch size for inference
                 roi_size = (32, 32, 32)
@@ -348,10 +356,6 @@ for epoch in range(max_epochs):
                 #print(f'Unique Values of Label Tensor: {torch.unique(val_labels)}')
                 
                 dice_metric(y_pred = val_outputs, y = val_labels)
-                
-                val_loss = loss_function(val_outputs, val_labels)
-                epoch_val_loss += val_loss.item()
-                epoch_val_len = len(validate_patches_dataset) // val_loader.batch_size
             
             avg_val_loss = epoch_val_loss/len(val_loader)
             val_loss_values.append(avg_val_loss)
@@ -376,7 +380,7 @@ print(time)
 # In[ ]:
 
 
-with open (f'/home/athurai3/scratch/monai_outputs/UNET/{date}/dicelossmodel_stats.txt', 'w') as file:  
+with open (f'/scratch/athurai3/monai_outputs/UNET/{date}/dicelossmodel_stats.txt', 'w') as file:  
     file.write(f'training time: {time}\n')  
     file.write(f'training loss: {epoch_loss_values[-patience]}\n validation loss: {early_stopping.val_loss_min}\n')
     file.write(f'validation dice metric: {val_dice_metric_values[-patience]}')
@@ -390,4 +394,4 @@ plt.plot(list(range(len(epoch_loss_values))), epoch_loss_values, label="Training
 plt.plot(list(range(len(val_loss_values))), val_loss_values , label="Validation Loss")
 plt.grid(True, "both", "both")
 plt.legend()
-plt.savefig(f'/home/athurai3/scratch/monai_outputs/UNET/{date}/dicelossfunction.png')
+plt.savefig(f'/scratch/athurai3/monai_outputs/UNET/{date}/dicelossfunction.png')
