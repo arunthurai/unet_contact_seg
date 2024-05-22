@@ -47,19 +47,30 @@ def determineFCSVCoordSystem(input_fcsv,overwrite_fcsv=False):
 
 def extract_coords(file_path):
     coord_sys=determineFCSVCoordSystem(file_path)
-    df = pd.read_csv(file_path, skiprows = 2)
-    coord_arr = df[['x','y','z']].to_numpy()
+    df = pd.read_csv(file_path, skiprows = 3, header = None)
+    coord_arr = df[[1,2,3]].to_numpy()
     if any(x in coord_sys for x in {'LPS','1'}):
         coord_arr = coord_arr * np.array([-1,-1,1])
     return coord_arr
 
-def transform_points_ct_space(coord_path, t1_ct_path):
-    coord_array = extract_coords(coord_path)
-    N = np.ones(coord_array.shape[0])
-    new_array = np.c_[coord_array, N].T
-    affine = np.loadtxt(t1_ct_path)
-    transformed_points = affine @ new_array
-    return transformed_points.T[:, :3]
+def transform_points_ct_space(coord_path, ct_t1_path):
+    t1_coords = extract_coords(coord_path)
+    ct_coords = np.zeros(t1_coords.shape)
+    transform = np.loadtxt(ct_t1_path)
+    transform = np.linalg.inv(transform)
+
+    M = transform[:3,:3]
+    abc = transform[:3,3]
+
+
+    for i in range(len(ct_coords)):
+        vec = t1_coords[i,:]
+        tvec = M.dot(vec) + abc
+        ct_coords[i,:] = tvec[:3]
+
+    ct_coords = np.round(ct_coords).astype(int)
+
+    return ct_coords
 
 def read_nifti(img_path):
     test_img = nib.load(img_path)
@@ -170,10 +181,10 @@ def check_coord_dims(pointa, pointb, img_size):
             return False
     return True
 
-def create_electrode_mask(img_path, coord_path, t1_ct_trans, final_path):
+def create_electrode_mask(img_path, coord_path, ct_t1_trans, final_path):
     img, img_data, img_aff, img_shape = read_nifti(img_path)
 
-    ct_coord_arr = transform_points_ct_space(coord_path, t1_ct_trans)
+    ct_coord_arr = transform_points_ct_space(coord_path, ct_t1_trans)
 
     transformed_coords = transform_coords_vox_space(ct_coord_arr, img_aff)
                    
@@ -186,7 +197,7 @@ def create_electrode_mask(img_path, coord_path, t1_ct_trans, final_path):
         
         test_mask = create_line_mask(pointa, pointb, img_shape)
                 
-        footprint = ball(6)
+        footprint = ball(4)
         dilated = dilation(test_mask, footprint)
         result = gaussian_filter(dilated.astype(float), sigma=0.6)
         final_mask += result>0
@@ -199,7 +210,7 @@ if __name__ == "__main__":
     create_electrode_mask(
         img_path=snakemake.input['znorm_ct'],
         coord_path = snakemake.input['actual'],
-        t1_ct_trans=snakemake.input['transform_matrix'],
+        ct_t1_trans=snakemake.input['transform_matrix'],
         final_path=snakemake.output["electrode_mask"],
     )
 

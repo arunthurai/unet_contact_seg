@@ -56,7 +56,7 @@ import matplotlib.pyplot as plt
 
 
 
-date="Feb19" #  put current date if training, test if just testing
+date="Feb21" #  put current date if training, test if just testing
 
 if not os.path.exists(f'/scratch/athurai3/monai_outputs/UNET/{date}'):
     os.makedirs(f'/scratch/athurai3/monai_outputs/UNET/{date}')
@@ -182,9 +182,9 @@ validate_patches_dataset = CacheDataset(data=arr_val_dict, transform = val_trans
 
 batch_size = 32
 training_steps = int(num_samples_tr / batch_size) # number of training steps per epoch
-print(f'Training Steps', training_steps)
+print(f'Training Steps: Samples/Batch Size', training_steps)
 validation_steps = int(num_samples_val/ batch_size) # number of validation steps per epoch
-print('Validation Steps', validation_steps)
+print('Validation Steps: Samples/Batch Size', validation_steps)
 
 
 # In[12]:
@@ -193,8 +193,8 @@ print('Validation Steps', validation_steps)
 train_loader = DataLoader(train_patches_dataset, batch_size=batch_size, shuffle=True, num_workers=2) #num_workers is number of cpus we request
 val_loader = DataLoader(validate_patches_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 
-print(len(train_loader))
-print(len(val_loader))
+print(f'Length of the DataLoader {len(train_loader)}')
+print(f'Length of the DataLoader {len(val_loader)}')
 
 
 # In[13]:
@@ -205,15 +205,18 @@ model = UNet(
     spatial_dims=3,
     in_channels=1,
     out_channels=1,
-    channels=(64, 128, 256, 512),
+    channels=(64, 128, 256, 512, 1024),
     strides=(2, 2, 2, 2),
-    num_res_units=2,
-    dropout = 0,
+    num_res_units= 4,
+    dropout = 0.2,
     norm=Norm.BATCH,
 ).to(device)
 loss_function = DiceCELoss(sigmoid = True) #revisit
 optimizer = torch.optim.Adam(model.parameters(), 1e-3)
 dice_metric = DiceMetric(include_background=True, reduction="mean")
+
+trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+print(f' Trainable Parameters: {trainable_params})
 
 
 # In[16]:
@@ -319,7 +322,7 @@ for epoch in range(max_epochs):
         
         epoch_loss += loss.item()
         epoch_len = len(train_patches_dataset) // train_loader.batch_size
-        print(f"{i}/{epoch_len}, train_loss: {loss.item():.4f}")
+        #print(f"{i}/{epoch_len}, train_loss: {loss.item():.4f}")
     
     avg_training_loss = epoch_loss/len(train_loader)
     epoch_loss_values.append(avg_training_loss)

@@ -5,14 +5,14 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=100G
-#SBATCH --time=24:00:00
+#SBATCH --time=3-00:00
 
 
 echo "begin"
 source $(kpy _kpy_wrapper)
 
 echo "Copying Files to SLURM_TMPDIR"
-cp '/scratch/athurai3/train_0p4mm/train_desc-35mm_patches.dat' '/scratch/athurai3/val_0p4mm/val_desc-35mm_patches.dat' $SLURM_TMPDIR
+cp '/scratch/athurai3/train_final/train_patches95.dat' '/scratch/athurai3/val_final/val_patches95.dat' $SLURM_TMPDIR
 
 echo "Files Copied to SLURM_TMPDIR"
 nvidia-smi
@@ -21,6 +21,7 @@ module load cuda cudnn
 
 kpy load monai_unet
 
+echo "training with patch size 96, diceCE loss"
 echo "beginning training"
 
-python3 projects/ctb-akhanf/athurai3/unet_contact_seg/monai_c3d_implementation/monai_c3d_dice.py
+python3 /scratch/athurai3/sandbox_contact_seg/monai_c3d_dice.py

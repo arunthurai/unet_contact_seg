@@ -1,5 +1,5 @@
-bids_dir: 'unused'
-output_dir: '/projects/ctb-akhanf/athurai3/unet_contact_seg/preproc_results'
+bids_dir: '/project/6050199/athurai3/seeg_data_final'
+output_dir: '/scratch/athurai3/preproc_final_2'
 
 #enable printing debug statements during parsing -- disable if generating dag visualization
 debug: False
@@ -22,23 +22,23 @@ targets_by_analysis_level:
 #    https://bids-standard.github.io/pybids/generated/bids.layout.BIDSLayout.html#bids.layout.BIDSLayout.get
 
 res_mm:
-  - '0p5mm'
+  - '0p4mm'
 
 pybids_inputs:
   ct:
     filters:
       suffix: 'ct'
+      session: 'post'
       extension: 'nii.gz'
       space: False
     wildcards:
       - subject
-      - session
       - acquisition
       - task
       - run
-    custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_ct.nii.gz'
+    #custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_ct.nii.gz'
 
-  landmarks_ct:
+  landmarks:
     filters:
       suffix: 'landmarks'
       extension: '.txt'
@@ -49,19 +49,19 @@ pybids_inputs:
       - acquisition
       - task
       - run
-    custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_space-ct_landmarks.txt'
+    custom_path: '/project/6050199/athurai3/seeg_data_final/sub-{subject}/sub-{subject}_landmarks.txt'
 
-  affine:
-    filters:
-      suffix: 'xfm'
-      extension: '.txt'
-    wildcards:
-      - subject
-      - session
-      - acquisition
-      - task
-      - run
-    custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_desc-affine_from-ct_to-T1w_type-ras_xfm.txt'
+  # affine:
+  #   filters:
+  #     suffix: 'xfm'
+  #     extension: '.txt'
+  #   wildcards:
+  #     - subject
+  #     - session
+  #     - acquisition
+  #     - task
+  #     - run
+  #   #custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_desc-affine_from-ct_to-T1w_type-ras_xfm.txt'
 
   rigid:
     filters:
@@ -73,7 +73,7 @@ pybids_inputs:
       - acquisition
       - task
       - run
-    custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_desc-rigid_from-ct_to-T1w_type-ras_xfm.txt'
+    custom_path: '/project/6050199/athurai3/seeg_data_final/sub-{subject}/sub-{subject}_desc-rigid_from-ct_to-T1w_type-ras_ses-post_xfm.txt'
 
   actual:
     filters:
@@ -84,7 +84,20 @@ pybids_inputs:
       - acquisition
       - task
       - run
-    custom_path: '/scratch/athurai3/seeg_data/seega_coordinates/sub-{subject}/sub-{subject}_space-native_actual.fcsv'
+    custom_path: '/project/6050199/athurai3/seeg_data_final/sub-{subject}/sub-{subject}_actual.fcsv'
+
+  # brainmask-space_T1w:
+  #   filters:
+  #     suffix: 
+  #     extension: 'nii.gz'
+  #   wildcards:
+  #     - subject
+  #     - session
+  #     - acquisition
+  #     - task
+  #     - run
+  #   custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_desc-brain_from-MNI152NLin2009cSym_reg-affine_mask.nii.gz'
+
 
 #configuration for the command-line parameters to make available
 # passed on the argparse add_argument()

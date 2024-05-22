@@ -16,7 +16,7 @@ from monai.data import PILReader
 from monai.transforms import (LoadImage, LoadImaged,ScaleIntensityRangePercentiles, Resized, Compose, SaveImage, 
 ScaleIntensity,RandScaleIntensity, SpatialPadd)
 from monai.config import print_config
-from monai.data import CacheDataset, NiftiSaver
+from monai.data import CacheDataset #NiftiSaver
 import glob
 import torch
 import nibabel as nib
@@ -53,18 +53,22 @@ from monai.config import print_config
 from monai.apps import download_and_extract
 import matplotlib.pyplot as plt
 
+TMP_DIR =  os.environ.get("SLURM_TMPDIR", "/tmp")
 
+fname_train = f'{TMP_DIR}/train_patches95.dat'
+fname_val = f'{TMP_DIR}/val_patches95.dat'
 
+model_desc="May16_patch95_4layers_diceCE" #  put current date if training, test if just testing
 
-date="Feb19" #  put current date if training, test if just testing
+if not os.path.exists(f'/scratch/athurai3/monai_outputs/UNET/{model_desc}'):
+    os.makedirs(f'/scratch/athurai3/monai_outputs/UNET/{model_desc}')
+    shutil.copy(f'/scratch/athurai3/sandbox_contact_seg/monai_c3d_dice.py', f'/scratch/athurai3/monai_outputs/UNET/{model_desc}')
 
-if not os.path.exists(f'/scratch/athurai3/monai_outputs/UNET/{date}'):
-    os.makedirs(f'/scratch/athurai3/monai_outputs/UNET/{date}')
 
 #hyperparameters
 batch_size = 2 #image data gen to read array generator from c3d*
 
-patch_radius= np.array([15,15,15]) #in voxels -- patch will be shape: 1+2*radius
+patch_radius= np.array([47,47,47]) #in voxels -- patch will be shape: 1+2*radius
 
 #3D rotation augmentation; only for training set
 num_augment = 2 #number of augmentations per patch
@@ -86,10 +90,8 @@ dims = 1+2*radius
 
 # In[3]:
 
-
-fname = '/scratch/athurai3/preproc_outputs/train_data/train_patches.dat'
 bps = 4 * num_channels * np.prod(dims)         # Bytes per sample
-file_size = os.path.getsize(fname) 
+file_size = os.path.getsize(fname_train) 
 num_samples_tr = np.floor_divide(file_size,bps)   # Number of samples
 print(file_size)
 print(bps)
@@ -100,15 +102,13 @@ print(num_samples_tr)
 dims = dims.astype('int')
 arr_shape_train = (num_samples_tr, dims[0],dims[1],dims[2],num_channels)
 
-arr_train = np.memmap(fname,'float32','r',shape=arr_shape_train)
+arr_train = np.memmap(fname_train,'float32','r',shape=arr_shape_train)
 #arr_train = np.swapaxes(arr_train,1,3)
 print(f'Training Array Shape: {arr_shape_train}')
 
 
 # In[5]:
 
-
-fname_val = '/scratch/athurai3/preproc_outputs/val_data/val_patches.dat'
 
 bps = 4 * num_channels * np.prod(dims)         # Bytes per sample
 file_size_val = os.path.getsize(fname_val) 
@@ -133,11 +133,20 @@ print(f'Validation Array Shape: {arr_shape_val}')
 arr_train = np.swapaxes(arr_train,1,4) #swap second axis with last -  that of channels (image/label)
 arr_val = np.swapaxes(arr_val, 1, 4) #swap second axis with last - that of channels (image/label)
 
-arr_train_image = arr_train[:,0,:,:,:].reshape(arr_train.shape[0],1,arr_train.shape[2],arr_train.shape[3],arr_train.shape[4])
-arr_train_label = arr_train[:,1,:,:,:].reshape(arr_train.shape[0],1,arr_train.shape[2],arr_train.shape[3],arr_train.shape[4])
+train_size = int(arr_train.shape[0]) #full data - arr_train.shape[0]
+val_size = int(arr_val.shape[0]) #full data - arr_val.shape[0]
 
-arr_val_image = arr_val[:,0,:,:,:].reshape(arr_val.shape[0],1, arr_val.shape[2],arr_val.shape[3],arr_val.shape[4])
-arr_val_label = arr_val[:,1,:,:,:].reshape(arr_val.shape[0],1, arr_val.shape[2],arr_val.shape[3],arr_val.shape[4])
+arr_train_image = arr_train[0:train_size, 0,:,:,:].reshape(train_size,1,arr_train.shape[2],arr_train.shape[3],arr_train.shape[4])
+arr_train_label = arr_train[0:train_size, 1,:,:,:].reshape(train_size,1,arr_train.shape[2],arr_train.shape[3],arr_train.shape[4])
+
+arr_val_image = arr_val[0:val_size, 0,:,:,:].reshape(val_size, 1, arr_val.shape[2],arr_val.shape[3],arr_val.shape[4])
+arr_val_label = arr_val[0:val_size, 1,:,:,:].reshape(val_size, 1, arr_val.shape[2],arr_val.shape[3],arr_val.shape[4])
+
+# arr_train_image = arr_train[0:5000,0,:,:,:].reshape(5000,1,arr_train.shape[2],arr_train.shape[3],arr_train.shape[4])
+# arr_train_label = arr_train[0:5000,1,:,:,:].reshape(5000,1,arr_train.shape[2],arr_train.shape[3],arr_train.shape[4])
+
+# arr_val_image = arr_val[0:500,0,:,:,:].reshape(500,1, arr_val.shape[2],arr_val.shape[3],arr_val.shape[4])
+# arr_val_label = arr_val[0:500,1,:,:,:].reshape(500,1, arr_val.shape[2],arr_val.shape[3],arr_val.shape[4])
 
 thresh_train_label = np.where(arr_train_label[:][:] > 0, 1, arr_train_label) #binarize labels
 thresh_val_label = np.where(arr_val_label[:][:] > 0, 1, arr_val_label) #binarize labels
@@ -157,7 +166,7 @@ train_transforms = Compose(
     [       
         SpatialPadd(
             keys = ("image", "label"),
-            spatial_size=(32,32,32)
+            spatial_size = (96,96,96)
         ),
         EnsureTyped (keys= ("image", "label"))
     ]
@@ -167,34 +176,34 @@ val_transforms = Compose(
     [
         SpatialPadd(
             keys = ("image", "label"),
-            spatial_size=(32,32,32)
+            spatial_size = (96,96,96)
         ),
         EnsureTyped (keys= ("image", "label"))
     ]
 )
 
-train_patches_dataset = CacheDataset(data=arr_train_dict ,transform = train_transforms, cache_rate =0.75, copy_cache=False, progress=True) # dataset with cache mechanism that can load data and cache deterministic transforms’ result during training.
-validate_patches_dataset = CacheDataset(data=arr_val_dict, transform = val_transforms, cache_rate = 0.75, copy_cache=False,progress=True)
+train_patches_dataset = CacheDataset(data=arr_train_dict ,transform = train_transforms, cache_rate = 0.7, copy_cache=False, progress=True) # dataset with cache mechanism that can load data and cache deterministic transforms’ result during training.
+validate_patches_dataset = CacheDataset(data=arr_val_dict, transform = val_transforms, cache_rate = 0.7, copy_cache=False,progress=True)
 
 
 # In[11]:
 
 
-batch_size = 32
+batch_size = 8
 training_steps = int(num_samples_tr / batch_size) # number of training steps per epoch
-print(f'Training Steps', training_steps)
+print(f'Training Steps: Samples({num_samples_tr})/Batch Size({batch_size})', training_steps)
 validation_steps = int(num_samples_val/ batch_size) # number of validation steps per epoch
-print('Validation Steps', validation_steps)
+print('Validation Steps: Samples({num_samples_val})/Batch Size({batch_size})', validation_steps)
 
 
 # In[12]:
 
 
-train_loader = DataLoader(train_patches_dataset, batch_size=batch_size, shuffle=True, num_workers=2) #num_workers is number of cpus we request
-val_loader = DataLoader(validate_patches_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+train_loader = DataLoader(train_patches_dataset, batch_size=batch_size, shuffle=True, num_workers=16) #num_workers is number of cpus we request
+val_loader = DataLoader(validate_patches_dataset, batch_size=batch_size, shuffle=True, num_workers=16)
 
-print(len(train_loader))
-print(len(val_loader))
+print(f'Length of the DataLoader {len(train_loader)}')
+print(f'Length of the DataLoader {len(val_loader)}')
 
 
 # In[13]:
@@ -206,14 +215,16 @@ model = UNet(
     in_channels=1,
     out_channels=1,
     channels=(64, 128, 256, 512),
-    strides=(2, 2, 2, 2),
-    num_res_units=2,
+    strides=(2, 2, 2),
     dropout = 0.2,
     norm=Norm.BATCH,
 ).to(device)
-loss_function = DiceCELoss(sigmoid = True) #revisit
+loss_function = DiceCELoss(sigmoid = True).to(device) #revisit
 optimizer = torch.optim.Adam(model.parameters(), 1e-3)
 dice_metric = DiceMetric(include_background=True, reduction="mean")
+
+trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+print(f' Trainable Parameters: {trainable_params}')
 
 
 # In[16]:
@@ -273,16 +284,15 @@ class EarlyStopping:
 
 
 import time
-patience = 20
+patience = 50
 early_stopping = EarlyStopping(patience = patience, 
                                verbose = True,
-                               delta = 0.001, 
-                               path = f'scratch/monai_outputs/UNET/{date}/checkpoint.pt')
+                               delta = 0, 
+                               path = f'/scratch/athurai3/monai_outputs/UNET/{model_desc}/checkpoint.pt')
 
 start = time.time() # initializing variable to calculate training time
 
-val_interval = 2
-max_epochs = 1000
+max_epochs = 200
 epoch_loss_values = [0]
 val_dice_metric_values = [0]
 val_loss_values = [0]
@@ -295,6 +305,7 @@ post_transforms = Compose(
     ]
 )
 
+print(device)
 
 for epoch in range(max_epochs):
     model.train()
@@ -306,8 +317,8 @@ for epoch in range(max_epochs):
         newline = True)
     
     for i, batch_data in enumerate(train_loader):
-        images = batch_data["image"].cuda()
-        labels = batch_data["label"].cuda()
+        images = batch_data["image"].to(device)
+        labels = batch_data["label"].to(device)
         
         optimizer.zero_grad()
         
@@ -318,57 +329,55 @@ for epoch in range(max_epochs):
         optimizer.step()
         
         epoch_loss += loss.item()
-        epoch_len = len(train_patches_dataset) // train_loader.batch_size
-        print(f"{i}/{epoch_len}, train_loss: {loss.item():.4f}")
+        #epoch_len = len(train_patches_dataset) // train_loader.batch_size
+        #print(f"{i}/{epoch_len}, train_loss: {loss.item():.4f}")
     
     avg_training_loss = epoch_loss/len(train_loader)
     epoch_loss_values.append(avg_training_loss)
     
     print(f"epoch {epoch + 1} average loss: {avg_training_loss:.4f}")
 
-    
-    if (epoch + 1) % val_interval == 0:
-        model.eval()
-    
-        with torch.inference_mode():
-            
-            epoch_val_loss = 0
-            
-            val_images = None
-            val_labels = None
-            val_outputs = None
-            
-            for i, batch_valdata in enumerate(val_loader):
-                val_images, val_labels = (batch_valdata["image"].cuda(), batch_valdata["label"].cuda())
+    model.eval()
 
-                # First update loss
-                outputs = model(val_images)
-                val_loss = loss_function(outputs, val_labels)
-                epoch_val_loss += val_loss.item()
-                
-                #sliding window size and batch size for inference
-                roi_size = (32, 32, 32)
-                sw_batch_size = 32
-                val_outputs = sliding_window_inference(val_images, roi_size, sw_batch_size, model)
-                val_outputs = post_transforms(val_outputs)
-                
-                #print(f'Unique Values of Prediction Tensor: {torch.unique(val_outputs)}')
-                #print(f'Unique Values of Label Tensor: {torch.unique(val_labels)}')
-                
-                dice_metric(y_pred = val_outputs, y = val_labels)
+    with torch.inference_mode():
+        
+        epoch_val_loss = 0
+        
+        val_images = None
+        val_labels = None
+        val_outputs = None
+        
+        for i, batch_valdata in enumerate(val_loader):
+            val_images, val_labels = (batch_valdata["image"].to(device), batch_valdata["label"].to(device))
+
+            # First update loss
+            outputs = model(val_images)
+            val_loss = loss_function(outputs, val_labels)
+            epoch_val_loss += val_loss.item()
             
-            avg_val_loss = epoch_val_loss/len(val_loader)
-            val_loss_values.append(avg_val_loss)
+            #sliding window size and batch size for inference
+            roi_size = (96, 96, 96)
+            sw_batch_size = 8
+            val_outputs = sliding_window_inference(val_images, roi_size, sw_batch_size, model)
+            val_outputs = post_transforms(val_outputs)
             
-            metric = dice_metric.aggregate().item()
-            dice_metric.reset()
-            val_dice_metric_values.append(metric)
+            #print(f'Unique Values of Prediction Tensor: {torch.unique(val_outputs)}')
+            #print(f'Unique Values of Label Tensor: {torch.unique(val_labels)}')
             
-            early_stopping(avg_val_loss, model)
-            
-            if early_stopping.early_stop:
-                print("Early Stopping")
-                break
+            dice_metric(y_pred = val_outputs, y = val_labels)
+        
+        avg_val_loss = epoch_val_loss/len(val_loader)
+        val_loss_values.append(avg_val_loss)
+        
+        metric = dice_metric.aggregate().item()
+        dice_metric.reset()
+        val_dice_metric_values.append(metric)
+        
+        early_stopping(avg_val_loss, model)
+        
+        if early_stopping.early_stop:
+            print("Early Stopping")
+            break
             
 
 
@@ -380,8 +389,9 @@ print(time)
 # In[ ]:
 
 
-with open (f'/scratch/athurai3/monai_outputs/UNET/{date}/dicelossmodel_stats.txt', 'w') as file:  
+with open (f'/scratch/athurai3/monai_outputs/UNET/{model_desc}/dicelossmodel_stats.txt', 'w') as file:  
     file.write(f'training time: {time}\n')  
+    file.write(f' Trainable Parameters: {trainable_params}\n')
     file.write(f'training loss: {epoch_loss_values[-patience]}\n validation loss: {early_stopping.val_loss_min}\n')
     file.write(f'validation dice metric: {val_dice_metric_values[-patience]}')
 
@@ -394,4 +404,4 @@ plt.plot(list(range(len(epoch_loss_values))), epoch_loss_values, label="Training
 plt.plot(list(range(len(val_loss_values))), val_loss_values , label="Validation Loss")
 plt.grid(True, "both", "both")
 plt.legend()
-plt.savefig(f'/scratch/athurai3/monai_outputs/UNET/{date}/dicelossfunction.png')
+plt.savefig(f'/scratch/athurai3/monai_outputs/UNET/{model_desc}/dicelossfunction.png')

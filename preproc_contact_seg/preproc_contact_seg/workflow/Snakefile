@@ -24,22 +24,32 @@ wildcard_constraints:  **get_wildcard_constraints(config['pybids_inputs'])
 #---- end snakebids boilerplate ------------------------------------------------
 
 #take union of affine and rigid
-affine_rigid_subjects = set(inputs['affine'].zip_lists['subject']) | set(inputs['rigid'].zip_lists['subject'])
+#affine_rigid_subjects = set(inputs['affine'].zip_lists['subject']) | set(inputs['rigid'].zip_lists['subject'])
 
 #intersect with other sets of subjects
-subjects = affine_rigid_subjects & set(inputs['ct'].zip_lists['subject']) & set(inputs['landmarks_ct'].zip_lists['subject'])
-
-print(subjects)
+#subjects = affine_rigid_subjects & set(inputs['ct'].zip_lists['subject']) & set(inputs['landmarks_ct'].zip_lists['subject'])
 
 rule all:
     input:
-        patches = expand(bids(
-            root=config['output_dir'],
-            suffix='patches.dat',
-            res='{res}',
-            **inputs['affine'].wildcards),
-                subject=subjects,
-                res=config['res_mm'])
+        electrode_mask = inputs['rigid'].expand(
+            bids(
+                root=config['output_dir'],
+                desc='electrode',
+                res='{res}',
+                suffix='mask.nii.gz',
+                **inputs['rigid'].wildcards),
+                res=config['res_mm']
+        )
+        # patches = inputs['rigid'].expand(
+        #     bids(
+        #         root=config['output_dir'],
+        #         suffix='patches95.dat',
+        #         res='{res}',
+        #         **inputs['rigid'].wildcards),
+        #         res=config['res_mm']
+        # )
+
+        
         
 rule resample:
     input:
@@ -47,14 +57,14 @@ rule resample:
     
     params:
         interpolation = 'Cubic',
-        dims = '0.5x0.5x0.5mm'
+        dims = '0.4x0.4x0.4mm'
     
     output:
         resampled_ct = bids(
             root=config['output_dir'],
             res='{res}',
             suffix='ct.nii.gz',
-            subject = '{subject}'
+            **inputs['rigid'].wildcards
         )
 
     group: 'subj'
@@ -65,28 +75,28 @@ rule resample:
     shell: 'c3d {input.orig_ct} -interpolation {params.interpolation} -resample-mm {params.dims} -o {output.resampled_ct}'
 
 
-def get_rigid_or_affine(wildcards):
-    #have the subject id (wildcards.subject)
-    #want to pick either rigid or affine, depending on which zip list contains the subject
-    if wildcards.subject in inputs['affine'].zip_lists['subject']:
-        return inputs['affine'].path
-    elif wildcards.subject in inputs['rigid'].zip_lists['subject']:
-        return inputs['rigid'].path
-    else:
-        print('subject has neither affine or rigid!')
+# def get_rigid_or_affine(wildcards):
+#     #have the subject id (wildcards.subject)
+#     #want to pick either rigid or affine, depending on which zip list contains the subject
+#     if wildcards.subject in inputs['affine'].zip_lists['subject']:
+#         return inputs['affine'].path
+#     elif wildcards.subject in inputs['rigid'].zip_lists['subject']:
+#         return inputs['rigid'].path
+#     else:
+#         print('subject has neither affine or rigid!')
         
 
 rule transform_points_ct:
     input: 
-        orig_point = inputs['landmarks_ct'].path,
-        aff = get_rigid_or_affine
+        orig_point = inputs['landmarks'].path,
+        aff = inputs['rigid'].path
     
     output:
         transformed_txt = bids(
             root=config['output_dir'],
             space = 'native_ct',
             suffix='landmarks.txt',
-            **inputs['affine'].wildcards
+            **inputs['rigid'].wildcards
         )
     
     group: 'subj'
@@ -94,8 +104,9 @@ rule transform_points_ct:
     run:
         import numpy as np
         affine = np.loadtxt(input.aff)
+        inv = np.linalg.inv(affine)
         points = np.loadtxt(input.orig_point).T
-        transformed_points = affine @ points
+        transformed_points = np.dot(inv, points)
         np.savetxt(output.transformed_txt, transformed_points.T, fmt='%f')
 
 rule create_contact_mask:
@@ -109,7 +120,7 @@ rule create_contact_mask:
             desc='contacts',
             res='{res}',
             suffix='mask.nii.gz',
-            **inputs['affine'].wildcards
+            **inputs['rigid'].wildcards
         )
 
     group: 'subj'
@@ -129,7 +140,7 @@ rule znormalize_ct:
             res='{res}',
             desc='z_norm',
             suffix='ct.nii.gz',
-            **inputs['affine'].wildcards
+            **inputs['rigid'].wildcards
         )
 
     resources:    
@@ -143,9 +154,9 @@ rule znormalize_ct:
 
 rule create_electrode_mask:
     input: 
-        znorm_ct = rules.znormalize_ct.output.znorm_ct,
+        znorm_ct = rules.resample.output.resampled_ct,  
         actual = inputs['actual'].path,
-        transform_matrix = get_rigid_or_affine,
+        transform_matrix = inputs['rigid'].path,
 
     output:
         electrode_mask = bids(
@@ -153,7 +164,7 @@ rule create_electrode_mask:
             desc='electrode',
             res='{res}',
             suffix='mask.nii.gz',
-            **inputs['affine'].wildcards
+            **inputs['rigid'].wildcards
         )
 
     group: 'subj'
@@ -165,35 +176,57 @@ rule create_electrode_mask:
         './scripts/electrode_mask_creation.py'
 
 
+# rule thresh_ct:
+#     input: 
+#         ct = rules.resample.output.resampled_ct,
 
+#     output:
+#         thresh = bids(
+#             root=config['output_dir'],
+#             desc='thresh_2500',
+#             res='{res}',
+#             suffix='ct.nii.gz',
+#             **inputs['affine'].wildcards
+#         )
 
-rule create_patches:
-    input:
-        znorm_ct = rules.znormalize_ct.output.znorm_ct,
-        contact_mask = rules.create_contact_mask.output.contact_mask,
-        electrode_mask = rules.create_electrode_mask.output.electrode_mask
-        #will update to binary brain mask
+#     group: 'subj'
+
+#     resources:    
+#         mem_mb = 32000
+
+#     container:
+#         config["singularity"]["diffparc"]
     
-    params:
-        radius_vector = '15x15x15', #patch dimensions will be (x*2)+1 voxels
-        n = '2', #sample n randomly augment patches
-        angle = '30', #stdev of normal distribution for sampling angle (in degrees)
-        frequency = '1000' #sample 1 patch for every n voxels
+#     shell: 'c3d {input.ct} -threshold 2500 inf 1 0 {output.thresh}'
 
-    output:
-        patches = bids(
-            root=config['output_dir'],
-            suffix='patches.dat',
-            res='{res}',
-            **inputs['affine'].wildcards
-        )
 
-    resources:    
-        mem_mb = 32000
+# rule create_patches:
+#     input:
+#         ct = rules.resample.output.resampled_ct,
+#         contact_mask = rules.create_contact_mask.output.contact_mask,
+#         electrode_mask = rules.create_electrode_mask.output.electrode_mask
+#         #will update to binary brain mask
     
-    group: 'subj'
+#     params:
+#         radius_vector = '47x47x47', #patch dimensions will be (x*2)+1 voxels
+#         n = '2', #sample n randomly augment patches
+#         angle = '30', #stdev of normal distribution for sampling angle (in degrees)
+#         frequency = '14000' #sample 1 patch for every n voxels
 
-    container:
-        config["singularity"]["diffparc"]
+#     output:
+#         patches = bids(
+#             root=config['output_dir'],
+#             suffix='patches95.dat',
+#             res='{res}',
+#             **inputs['rigid'].wildcards
+#         )
 
-    shell: 'c3d {input.znorm_ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches} {params.radius_vector} {params.frequency}'
+#     resources:    
+#         mem_mb = 32000
+    
+#     group: 'subj'
+
+#     container:
+#         config["singularity"]["diffparc"]
+
+#     shell: 'c3d {input.ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches} {params.radius_vector} {params.frequency}'
