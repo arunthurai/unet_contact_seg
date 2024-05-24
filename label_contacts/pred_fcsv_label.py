@@ -59,9 +59,15 @@ def line_point_distance(point, line_points):
     return np.linalg.norm(d)
     
 
-test_dir = '/scratch/athurai3/val_0p4mm'
-fcsv_dir = '/scratch/athurai3/seeg_data/seega_coordinates/'
 model_desc = 'Mar16_patch95_4layers_diceCE'
+test_dir = '/scratch/athurai3/val_0p4mm'
+gt_dir = '/project/6050199/athurai3/seeg_data_final'
+preproc_dir = '/scratch/athurai3/preproc_final'
+output_dir = f'/scratch/athurai3/monai_outputs/{model_desc}/rerun'
+
+if not os.path.exists(f'{output_dir}'):
+    os.makedirs(f'{output_dir}')
+
 subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
 test_seega = []
 test_pred = []
@@ -73,19 +79,24 @@ subjects.sort()
 
 for subject in subjects:
     print(subject)
-    #subj_fcsv = f'{fcsv_dir}/{subject}/{subject}_space-native_SEEGA.fcsv'
     subj_pred = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}_res-0p4mm_desc-z_norm_pred_ct.nii.gz'
-    subj_electrode_mask = f'/scratch/athurai3/preproc_0p4mm/{subject}/{subject}_res-0p4mm_desc-electrode_mask.nii.gz'
-    #test_seega.append(subj_fcsv)
-    #test_pred.append(subj_pred)
-    #test_electrode_mask.append(subj_electrode_mask)
+    subj_electrode_mask = f'{preproc_dir}/{subject}/{subject}_res-0p4mm_desc-electrode_mask.nii.gz'
+  
+    final_fname_ct = f'{output_dir}/{subject}_res-0p4mm_desc-space-ct_unet.fcsv'
+    final_fname_t1 = f'{output_dir}{subject}_res-0p4mm_desc-space-T1w_unet.fcsv'
+    subj_transform = f'{gt_dir}/{subject}/{subject}_desc-rigid_from-ct_to-T1w_type-ras_ses-post_xfm.txt'
 
-    if subject == 'sub-P011':
+    print(subj_pred)
+    print(subj_transform)
+    print(subj_electrode_mask)
+    if glob.glob(final_fname_ct) and glob.glob(final_fname_t1):
+        print(f'{subject} completed!')
+
+    else:
+        print('blah')
+
         pred_img = nib.load(subj_pred)
 
-        final_fname_ct = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-ct_unet.fcsv'
-        final_fname_t1 = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-T1w_unet.fcsv'
-        
         electrode_img_data = nib.load(subj_electrode_mask).get_fdata()
 
         pred_data = np.where(pred_img.get_fdata()>0.5, 1.0, 0.0)
@@ -148,115 +159,31 @@ for subject in subjects:
         ras_points['label'] = df_pred_sub['labels'].reset_index(drop = True)
         print('Saving File')
         df_to_fcsv(ras_points, final_fname_ct)
-        df_to_fcsv(ras_points, final_fname_t1)          
-    
-    elif glob.glob(subj_pred):
-    
-        final_fname_ct = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-ct_unet.fcsv'
-        final_fname_t1 = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-T1w_unet.fcsv'
-        t1_tsv_file = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-T1w_unet.tsv'
-        subj_transform = f'/scratch/athurai3/seeg_data/atlasreg/{subject}/{subject}_desc-rigid_from-ct_to-T1w_type-ras_xfm.txt'
-        print(subj_pred)
-        print(subj_transform)
-        print(subj_electrode_mask)
-        if glob.glob(final_fname_ct) and glob.glob(final_fname_t1):
-            print(f'{subject} completed!')
 
-        else:
-            print('blah')
+        trans = np.loadtxt(subj_transform)
 
-            pred_img = nib.load(subj_pred)
+        M = trans[:3,:3]
+        abc = trans[:3,3]
 
-            electrode_img_data = nib.load(subj_electrode_mask).get_fdata()
+        #create empty array to fill with transformed coordinates
+        t1_coords = np.zeros(ras_points[['x','y','z']].shape)
+        ct_coords = ras_points[['x','y','z']].to_numpy()
+        print('Transforming to T1 Space')
+        #apply tranformations row by row
+        for i in range(len(t1_coords)):
+            vec = ct_coords[i,:]
+            tvec = M.dot(vec) + abc
+            t1_coords[i,:] = tvec[:3]
 
-            pred_data = np.where(pred_img.get_fdata()>0.5, 1.0, 0.0)
-
-            print('Multpliying by electrode mask')
-            labelled_pred = label(pred_data*electrode_img_data)
-
-            pointlist_pred={
-                'x':[],
-                'y':[],
-                'z':[],
-                'labels':[],
-                'area': []
-            }
-
-            print('Finding Centroids of Segmented Contacts')
-            for regions in regionprops(labelled_pred):
-                pointlist_pred['x'].append(regions.centroid[0])
-                pointlist_pred['y'].append(regions.centroid[1])
-                pointlist_pred['z'].append(regions.centroid[2])
-                pointlist_pred['labels'].append(regions.label)
-                pointlist_pred['area'].append(regions.area)
-
-
-            df_pred_sub = pd.DataFrame(pointlist_pred)
-
-            voxel_volume = np.abs(np.prod(np.diag(pred_img.affine)[:3]))
-
-            df_pred_sub['area_mm3'] = df_pred_sub['area'] * voxel_volume
-
-            area_thresh = [voxel_volume, 15.0]
-
-            df_pred_sub['size_ok'] = True
-
-            df_pred_sub['area_mm3'] = df_pred_sub['area'] * voxel_volume
-            df_pred_sub.loc[df_pred_sub['area_mm3'] < area_thresh[0],
-                         'size_ok'] = False
-            df_pred_sub.loc[df_pred_sub['area_mm3'] > area_thresh[1],
-                         'size_ok'] = False
-
-            size_filter_pred = df_pred_sub.loc[df_pred_sub['size_ok']==True]
-
-            coords = size_filter_pred[['x', 'y', 'z']].to_numpy()
-
-            #take zooms/translations from image affine
-            M = pred_img.affine[:3,:3]
-            abc = pred_img.affine[:3,3]
-
-            #create empty array to fill with transformed coordinates
-            transformed_coords = np.zeros(coords.shape)
-            print('Transforming from voxel to coordinate space')
-            #apply tranformations row by row
-            for i in range(len(transformed_coords)):
-                vec = coords[i,:]
-                tvec = M.dot(vec) + abc
-                transformed_coords[i,:] = tvec[:3]
-
-            #create new df of transformed points
-            ras_points = pd.DataFrame(transformed_coords, columns = ['x','y','z'])
-            ras_points['label'] = df_pred_sub['labels'].reset_index(drop = True)
-            print('Saving File')
-            df_to_fcsv(ras_points, final_fname_ct)
-
-            trans = np.loadtxt(subj_transform)
-
-            M = trans[:3,:3]
-            abc = trans[:3,3]
-
-            #create empty array to fill with transformed coordinates
-            t1_coords = np.zeros(ras_points[['x','y','z']].shape)
-            ct_coords = ras_points[['x','y','z']].to_numpy()
-            print('Transforming to T1 Space')
-            #apply tranformations row by row
-            for i in range(len(t1_coords)):
-                vec = ct_coords[i,:]
-                tvec = M.dot(vec) + abc
-                t1_coords[i,:] = tvec[:3]
-
-            t1_points = pd.DataFrame(t1_coords, columns = ['x','y','z'])
-            t1_points['label'] = size_filter_pred['labels'].reset_index(drop = True)
-            df_to_fcsv(t1_points, final_fname_t1)
-    else:
-        print(f'{subject} not in validation folder')
+        t1_points = pd.DataFrame(t1_coords, columns = ['x','y','z'])
+        t1_points['label'] = size_filter_pred['labels'].reset_index(drop = True)
+        df_to_fcsv(t1_points, final_fname_t1)
 
 print('Loop 2: Labelling')  
 for subject in subjects:
     print(f'{subject}') 
     
-    final_fname_t1 = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-T1w_unet.fcsv'
-    t1_tsv_file = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-T1w_unet.tsv'
+    final_fname_t1 = f'{output_dir}/{subject}_res-0p4mm_desc-space-T1w_unet.fcsv'
     
     if glob.glob(final_fname_t1):
     
@@ -302,9 +229,4 @@ for subject in subjects:
         labeled_contacts = df_sorted[["x","y","z",'label_order']]
 
         df_to_fcsv(labeled_contacts,f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-T1w_unet.fcsv')
-
-        tsv_contacts = labeled_contacts
-        tsv_contacts.rename(columns = {'label_order':'label'})
-        #head = ['x','y','z', 'label']
-        tsv_contacts.round(3).to_csv(t1_tsv_file, sep='\t', index=False, header=False)
 

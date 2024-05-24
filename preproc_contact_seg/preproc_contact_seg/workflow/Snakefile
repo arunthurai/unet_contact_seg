@@ -39,6 +39,15 @@ rule all:
                 suffix='mask.nii.gz',
                 **inputs['rigid'].wildcards),
                 res=config['res_mm']
+        ),
+        contact_mask = inputs['rigid'].expand(
+            bids(
+                root=config['output_dir'],
+                desc='contacts',
+                res='{res}',
+                suffix='mask.nii.gz',
+                **inputs['rigid'].wildcards),
+                res=config['res_mm']
         )
         # patches = inputs['rigid'].expand(
         #     bids(
