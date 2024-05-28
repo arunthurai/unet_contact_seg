@@ -68,7 +68,7 @@ def transform_points_ct_space(coord_path, ct_t1_path):
         tvec = M.dot(vec) + abc
         ct_coords[i,:] = tvec[:3]
 
-    ct_coords = np.round(ct_coords).astype(int)
+    #ct_coords = np.round(ct_coords).astype(int)
 
     return ct_coords
 
@@ -173,13 +173,6 @@ def transform_coords_vox_space(planned_coords, img_aff):
     transform_coords = np.round(transform_coords).astype(int)
 
     return transform_coords
-
-def check_coord_dims(pointa, pointb, img_size):
-    for i in range(3):
-        if pointa[i] > img_size[i] or pointb[i] > img_size[i]:
-            print('review planned_fcsv - dim mismatch')
-            return False
-    return True
 
 def create_electrode_mask(img_path, coord_path, ct_t1_trans, final_path):
     img, img_data, img_aff, img_shape = read_nifti(img_path)

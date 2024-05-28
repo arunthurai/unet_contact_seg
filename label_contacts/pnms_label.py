@@ -32,9 +32,9 @@ def df_to_fcsv(input_df, output_fcsv):
 	
 	for idx,ifid in input_df.iterrows():
 		out_df['node_id'].append(idx+1)
-		out_df['x'].append(ifid[0])
-		out_df['y'].append(ifid[1])
-		out_df['z'].append(ifid[2])
+		out_df['x'].append(ifid.iloc[0])
+		out_df['y'].append(ifid.iloc[1])
+		out_df['z'].append(ifid.iloc[2])
 		out_df['ow'].append(0)
 		out_df['ox'].append(0)
 		out_df['oy'].append(0)
@@ -42,7 +42,7 @@ def df_to_fcsv(input_df, output_fcsv):
 		out_df['vis'].append(1)
 		out_df['sel'].append(1)
 		out_df['lock'].append(1)
-		out_df['label'].append(str(ifid[3]))
+		out_df['label'].append(str(ifid.iloc[3]))
 		out_df['description'].append('')
 		out_df['associatedNodeID'].append('')
 
