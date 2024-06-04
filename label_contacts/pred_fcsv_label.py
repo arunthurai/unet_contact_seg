@@ -34,9 +34,9 @@ def df_to_fcsv(input_df, output_fcsv):
 	
 	for idx,ifid in input_df.iterrows():
 		out_df['node_id'].append(idx+1)
-		out_df['x'].append(ifid[0])
-		out_df['y'].append(ifid[1])
-		out_df['z'].append(ifid[2])
+		out_df['x'].append(ifid.iloc[0])
+		out_df['y'].append(ifid.iloc[1])
+		out_df['z'].append(ifid.iloc[2])
 		out_df['ow'].append(0)
 		out_df['ox'].append(0)
 		out_df['oy'].append(0)
@@ -44,7 +44,7 @@ def df_to_fcsv(input_df, output_fcsv):
 		out_df['vis'].append(1)
 		out_df['sel'].append(1)
 		out_df['lock'].append(1)
-		out_df['label'].append(str(ifid[3]))
+		out_df['label'].append(str(ifid.iloc[3]))
 		out_df['description'].append('')
 		out_df['associatedNodeID'].append('')
 
@@ -59,31 +59,26 @@ def line_point_distance(point, line_points):
     return np.linalg.norm(d)
     
 
-model_desc = 'Mar16_patch95_4layers_diceCE'
-test_dir = '/scratch/athurai3/val_0p4mm'
+model_desc = 'May16_patch95_4layers_diceCE'
+test_dir = '/scratch/athurai3/val_final'
 gt_dir = '/project/6050199/athurai3/seeg_data_final'
 preproc_dir = '/scratch/athurai3/preproc_final'
-output_dir = f'/scratch/athurai3/monai_outputs/{model_desc}/rerun'
+output_dir = f'/scratch/athurai3/monai_outputs/{model_desc}/coordinates'
 
 if not os.path.exists(f'{output_dir}'):
     os.makedirs(f'{output_dir}')
 
 subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
-test_seega = []
-test_pred = []
-test_electrode_mask = []
-test_fcsv = []
-test_transforms = []
 subjects.sort()
 
 
 for subject in subjects:
     print(subject)
-    subj_pred = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}_res-0p4mm_desc-z_norm_pred_ct.nii.gz'
+    subj_pred = f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}_res-0p4mm_desc-pred_ct.nii.gz'
     subj_electrode_mask = f'{preproc_dir}/{subject}/{subject}_res-0p4mm_desc-electrode_mask.nii.gz'
   
     final_fname_ct = f'{output_dir}/{subject}_res-0p4mm_desc-space-ct_unet.fcsv'
-    final_fname_t1 = f'{output_dir}{subject}_res-0p4mm_desc-space-T1w_unet.fcsv'
+    final_fname_t1 = f'{output_dir}/{subject}_res-0p4mm_desc-space-T1w_unet.fcsv'
     subj_transform = f'{gt_dir}/{subject}/{subject}_desc-rigid_from-ct_to-T1w_type-ras_ses-post_xfm.txt'
 
     print(subj_pred)
@@ -118,28 +113,28 @@ for subject in subjects:
             pointlist_pred['y'].append(regions.centroid[1])
             pointlist_pred['z'].append(regions.centroid[2])
             pointlist_pred['labels'].append(regions.label)
-            pointlist_pred['area'].append(regions.area)
+            #pointlist_pred['area'].append(regions.area)
 
 
         df_pred_sub = pd.DataFrame(pointlist_pred)
 
-        voxel_volume = np.abs(np.prod(np.diag(pred_img.affine)[:3]))
+        # voxel_volume = np.abs(np.prod(np.diag(pred_img.affine)[:3]))
 
-        df_pred_sub['area_mm3'] = df_pred_sub['area'] * voxel_volume
+        # df_pred_sub['area_mm3'] = df_pred_sub['area'] * voxel_volume
 
-        area_thresh = [voxel_volume, 15.0]
+        # area_thresh = [voxel_volume, 15.0]
 
-        df_pred_sub['size_ok'] = True
+        # df_pred_sub['size_ok'] = True
 
-        df_pred_sub['area_mm3'] = df_pred_sub['area'] * voxel_volume
-        df_pred_sub.loc[df_pred_sub['area_mm3'] < area_thresh[0],
-                        'size_ok'] = False
-        df_pred_sub.loc[df_pred_sub['area_mm3'] > area_thresh[1],
-                        'size_ok'] = False
+        # df_pred_sub['area_mm3'] = df_pred_sub['area'] * voxel_volume
+        # df_pred_sub.loc[df_pred_sub['area_mm3'] < area_thresh[0],
+        #                 'size_ok'] = False
+        # df_pred_sub.loc[df_pred_sub['area_mm3'] > area_thresh[1],
+        #                 'size_ok'] = False
 
-        size_filter_pred = df_pred_sub.loc[df_pred_sub['size_ok']==True]
+        # size_filter_pred = df_pred_sub.loc[df_pred_sub['size_ok']==True]
 
-        coords = size_filter_pred[['x', 'y', 'z']].to_numpy()
+        coords = df_pred_sub[['x', 'y', 'z']].to_numpy()
 
         #take zooms/translations from image affine
         M = pred_img.affine[:3,:3]
@@ -176,7 +171,7 @@ for subject in subjects:
             t1_coords[i,:] = tvec[:3]
 
         t1_points = pd.DataFrame(t1_coords, columns = ['x','y','z'])
-        t1_points['label'] = size_filter_pred['labels'].reset_index(drop = True)
+        t1_points['label'] = df_pred_sub['labels'].reset_index(drop = True)
         df_to_fcsv(t1_points, final_fname_t1)
 
 print('Loop 2: Labelling')  
@@ -189,7 +184,7 @@ for subject in subjects:
     
         df = pd.read_csv(final_fname_t1, header = 2)
         contacts = df[["x","y","z"]].to_numpy()
-        df_te = pd.read_csv(f'{fcsv_dir}/{subject}/{subject}_space-native_actual.fcsv', header = 2)
+        df_te = pd.read_csv(f'{gt_dir}/{subject}/{subject}_actual.fcsv', header = 2)
         te_coords = df_te[['x','y','z','label']]
 
 
@@ -228,5 +223,5 @@ for subject in subjects:
 
         labeled_contacts = df_sorted[["x","y","z",'label_order']]
 
-        df_to_fcsv(labeled_contacts,f'/scratch/athurai3/monai_outputs/{model_desc}/{subject}/{subject}_res-0p4mm_desc-space-T1w_unet.fcsv')
+        df_to_fcsv(labeled_contacts,f'{output_dir}/{subject}_res-0p4mm_desc-space-T1w_unet.fcsv')
 

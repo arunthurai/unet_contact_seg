@@ -77,20 +77,29 @@ def filter_points(points_df, mask_data, mask_affine):
     return pd.DataFrame(filtered_points)
     
 
-model_desc = 'Mar16_patch95_4layers_diceCE'
+model_desc = 'May14_patch95_4layers_diceCE'
 pnms_dir = f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms'
+test_dir = f'/scratch/athurai3/val_final'
 gt_dir = '/project/6050199/athurai3/seeg_data_final'
 old_dir = '/project/6050199/cfmm-bids/Khan/clinical_imaging/epi_ieeg/atlasreg'
 
+if not os.path.exists(f'{pnms_dir}'):
+    os.makedirs(f'{pnms_dir}')
 
-subjects = []
+subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
 
-for root, dirs, files in os.walk(pnms_dir):
-    for file in files:
-        subject = file.split('_')[0]
-        if subject not in subjects:
-            print(subject)
-            subjects.append(subject)
+# subjects = []
+
+# for root, dirs, files in os.walk(test_dir):
+#     for file in files:
+#         subject = file.split('_')[0]
+#         if subject not in subjects:
+#             print(subject)
+#             subjects.append(subject)
+
+print(subjects)
+
+subjects.sort()
 
 print(subjects)
 
@@ -100,7 +109,7 @@ test_fcsv = []
 test_transforms = []
 
      
-for sub in subjects.sort():
+for sub in subjects:
     print(sub)
     final_fname_t1 = f'{pnms_dir}/{sub}_space-T1w_desc-unet_pnms.fcsv'
     orig_pnms = pd.read_csv(f'{pnms_dir}/{sub}_prob_nms.fcsv', skiprows=3, header = None)

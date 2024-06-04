@@ -114,7 +114,7 @@ def df_to_fcsv(input_df, output_fcsv):
 		out_df['sel'].append(1)
 		out_df['lock'].append(1)
 		out_df['label'].append(str(ifid.iloc[3]))
-		out_df['description'].append('')
+		out_df['description'].append(str(ifid.iloc[4]))
 		out_df['associatedNodeID'].append('')
 
 	out_df=pd.DataFrame(out_df)
@@ -368,6 +368,10 @@ pnms_dir = f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms'
 gt_dir = '/project/6050199/athurai3/seeg_data_final'
 test_dir = '/scratch/athurai3/val_final'
 
+adtech_dict = dict(
+    [(3,"RD10R-SP03X"), (4,"RD10R-SP04X"), (5,"RD10R-SP05X"), (6,"RD10R-SP06X"), (7,"RD10R-SP07X")]
+)
+    
 
 subjects = []
 
@@ -378,7 +382,7 @@ print(sorted(subjects))
      
 for sub in sorted(subjects)[:-1]:
     print(sub)
-    final_fname_t1 = f'{pnms_dir}/{sub}_space-T1w_desc-unet_pnms_v2.fcsv'
+    final_fname_t1 = f'{pnms_dir}/{sub}_space-T1w_desc-unet_pnms_nomask.fcsv'
     orig_pnms = pd.read_csv(f'{pnms_dir}/{sub}_prob_nms.fcsv', skiprows=3, header = None)
     ct_t1_trans = np.loadtxt(f'{gt_dir}/{sub}/{sub}_desc-rigid_from-ct_to-T1w_type-ras_ses-post_xfm.txt')
     
@@ -406,15 +410,15 @@ for sub in sorted(subjects)[:-1]:
     transformed_coords = np.round(transform_coords_vox_space(coords_interest, inv_affine)).astype(int)
     
     # Empty final df
-    df_pos = pd.DataFrame(columns=['x', 'y', 'z', 'label_order'])
+    df_pos = pd.DataFrame(columns=['x', 'y', 'z', 'label_order', 'desc'])
     df_distance = pd.DataFrame(columns=['electrode', 'avg_distance'])
     elec_labels = []
     avg_distances = []
 
-    # electrode_mask = nib.load(f'/scratch/athurai3/preproc_final/{sub}/{sub}_res-0p4mm_desc-electrode_mask.nii.gz')
-    # electrode_mask = electrode_mask.get_fdata()
+    electrode_mask = nib.load(f'/scratch/athurai3/preproc_final/{sub}/{sub}_res-0p4mm_desc-electrode_mask.nii.gz')
+    electrode_mask = electrode_mask.get_fdata()
 
-    # filtered_coords = coords_interest[electrode_mask[transformed_coords[:,0], transformed_coords[:,1], transformed_coords[:,2]] > 0]
+    filtered_coords = coords_interest[electrode_mask[transformed_coords[:,0], transformed_coords[:,1], transformed_coords[:,2]] > 0]
     
     # Compute for each pair of entry-target
     for i in range(0,entry_target.shape[0],2):  
@@ -425,11 +429,11 @@ for sub in sorted(subjects)[:-1]:
         """
         First stage: Masking filtering
         """
-        electrode_mask = create_electrode_mask(data, entry_target_vox)
+        # electrode_mask = create_electrode_mask(data, entry_target_vox)
 
         # Mask the contacts inside the mask
-        filtered_coords = coords_interest[electrode_mask[transformed_coords[:,0], transformed_coords[:,1], transformed_coords[:,2]]]
-        print(filtered_coords.shape, flush=True)
+        # filtered_coords = coords_interest[electrode_mask[transformed_coords[:,0], transformed_coords[:,1], transformed_coords[:,2]]]
+        # print(filtered_coords.shape, flush=True)
         
         """
         Second stage: Line filtering
@@ -439,7 +443,7 @@ for sub in sorted(subjects)[:-1]:
                                                                contacts = filtered_coords, 
                                                                max_angle_target = 35, 
                                                                max_distance_prior = 2, 
-                                                               min_distance_prior = 0.25, 
+                                                               min_distance_prior = 0.5, 
                                                                initial_spacing=4)
         """
         Third stage: Labelling
@@ -450,8 +454,17 @@ for sub in sorted(subjects)[:-1]:
         t1_coords = transform_points_t1_space(found_contacts, ct_t1_trans) #t1_coords = mne.transforms.apply_trans(ct_t1_trans, found_contacts)
         df_tmp = pd.DataFrame(t1_coords, columns=['x','y','z'])
         df_tmp['label_order'] = [f'{label}-{idx+1:02d}' for idx in range(found_contacts.shape[0])]
-        df_pos = pd.concat([df_pos, df_tmp])
         print('Number of contacts found: ',  found_contacts.shape[0], '\n')
+        if found_contacts.shape[0] < 8:
+            print(f'{sub} Review', '\n')
+        if np.round(avg_distance) in adtech_dict.keys():
+            #print(adtech_dict[np.round(avg_distance)])
+            df_tmp['desc'] = adtech_dict[np.round(avg_distance)]
+        else:
+            df_tmp['desc'] = 'NA'
+        
+        df_pos = pd.concat([df_pos, df_tmp])
+        
     
     df_to_fcsv(df_pos, final_fname_t1)
 
