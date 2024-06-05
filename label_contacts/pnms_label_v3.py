@@ -288,7 +288,9 @@ def run_segmentation_qc_new(entry_point,
                              max_angle_target, 
                              max_distance_prior, 
                              min_distance_prior, 
-                             initial_spacing=4):
+                             initial_spacing=4,
+                             max_n_contacts = -1 # set to -1 to apply distance threshold to entry
+                           ):
     original_direction = trace_line(entry_point, target_point)
     direction = original_direction
     current_point = target_point
@@ -320,9 +322,7 @@ def run_segmentation_qc_new(entry_point,
         found_contacts.append(next_contact)
         distances_between_contacts.append(np.linalg.norm(next_contact - current_point))
         if len(found_contacts) >= 3:
-            # print('Cambio direccion \n')
             direction = adjust_direction_using_all_contacts(found_contacts, original_direction)
-            # print(direction)
         current_point = next_contact
 
         avg_distance = np.mean(distances_between_contacts)
@@ -336,7 +336,8 @@ def run_segmentation_qc_new(entry_point,
                                                            max_distance_prior, 
                                                            min_distance_prior, 
                                                            avg_distance, 
-                                                           entry_point)
+                                                           entry_point,
+                                                          distance_from_entry=1.5 if len(found_contacts)>max_n_contacts else None)
         else:
             next_contact = None
     print(f"Adjusted Mean Distance: {avg_distance}")
@@ -414,37 +415,59 @@ for sub in sorted(subjects)[:-1]:
     df_distance = pd.DataFrame(columns=['electrode', 'avg_distance'])
     elec_labels = []
     avg_distances = []
-
+    
+    """
+    First stage: Masking filtering
+    """
     electrode_mask = nib.load(f'/scratch/athurai3/preproc_final/{sub}/{sub}_res-0p4mm_desc-electrode_mask.nii.gz')
     electrode_mask = electrode_mask.get_fdata()
 
     filtered_coords = coords_interest[electrode_mask[transformed_coords[:,0], transformed_coords[:,1], transformed_coords[:,2]] > 0]
     
+    """
+    Second stage: Line filtering
+    """
+    # Run a first time to figure out the amount of contacts
     # Compute for each pair of entry-target
+    n_contacts = []
+    contacts_coords = []
     for i in range(0,entry_target.shape[0],2):  
         # Label for the contact
         label = entry_target[i,-1]
-        print(label, flush=True)
-        
-        """
-        First stage: Masking filtering
-        """
-        # electrode_mask = create_electrode_mask(data, entry_target_vox)
-
-        # Mask the contacts inside the mask
-        # filtered_coords = coords_interest[electrode_mask[transformed_coords[:,0], transformed_coords[:,1], transformed_coords[:,2]]]
-        # print(filtered_coords.shape, flush=True)
-        
-        """
-        Second stage: Line filtering
-        """
-        found_contacts, avg_distance = run_segmentation_qc_new(entry_point = entry_target_coords[i+1, :],
+        print(label, flush=True)        
+        found_contacts, _ = run_segmentation_qc_new(entry_point = entry_target_coords[i+1, :],
                                                                target_point = entry_target_coords[i, :],
                                                                contacts = filtered_coords, 
                                                                max_angle_target = 35, 
                                                                max_distance_prior = 2, 
                                                                min_distance_prior = 0.5, 
                                                                initial_spacing=4)
+        n_contacts.append(len(found_contacts))
+        contacts_coords.append(found_contacts)
+    # Find the max_n_contacts
+    print(n_contacts)
+    elements, count = np.unique(n_contacts, return_counts=True)
+    max_n_contacts = np.max(elements[count>1])
+    print('Number of contacts for electrode: ', max_n_contacts)
+    
+    # Now repeat to find the actual points
+    # Compute for each pair of entry-target
+    for i in range(0,entry_target.shape[0],2):  
+        # Label for the contact
+        label = entry_target[i,-1]
+        print(label, flush=True)
+
+        # Only re-execute if len(found_contacts)<max_n_contacts (not all contacts were found)
+        found_contacts = contacts_coords[i//2]
+        if len(found_contacts) < max_n_contacts:
+            found_contacts, avg_distance = run_segmentation_qc_new(entry_point = entry_target_coords[i+1, :],
+                                                               target_point = entry_target_coords[i, :],
+                                                               contacts = filtered_coords, 
+                                                               max_angle_target = 35, 
+                                                               max_distance_prior = 2, 
+                                                               min_distance_prior = 0.5, 
+                                                               initial_spacing=4,
+                                                               max_n_contacts=max_n_contacts)
         """
         Third stage: Labelling
         """

@@ -11,4 +11,7 @@ electrode_masks/
 .ipynb_checkpoints
 monai_c3d_implementation/.ipynb_checkpoints
 preproc_contact_seg/preproc_contact_seg/.venv/
-monai_c3d_implementation/.ipynb_checkpoints
+monai_c3d_implementation/.ipynb_checkpoints*
+data/
+*.nii.gz
+*.zip
