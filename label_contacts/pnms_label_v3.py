@@ -210,7 +210,8 @@ def find_next_contact_new(current_point,
                       min_distance_prior, # percentage
                       avg_distance,
                       entry_point,
-                      distance_from_entry=1.5):
+                      distance_from_entry=1.5,
+                        ):
     next_contact = None
     next_contact_id = None
     min_distance = float('inf')
@@ -233,15 +234,19 @@ def find_next_contact_new(current_point,
         # print(ind, angle_contact, distance_prior, distance_entry)
         # print(0, max_distance_prior*avg_distance, min_distance_prior*avg_distance, distance_from_entry, '\n')
         distance_metric = np.sqrt(distance_target**2+distance_prior**2) # balance between distance to target and prior
-        # Check conditions
+        # Check that it's the closest point to the target, 
+        # that it's below a specific distance from the target
+        # and above a certain distance from the current point,
+        # that it is not too close to the entry
+        # and that is not beyond the entry point
         if (distance_metric < min_distance and
             angle_contact <= max_angle_target and
             distance_prior >= min_distance_prior*avg_distance and
-            distance_prior <= max_distance_prior*avg_distance and
-            (distance_entry >= distance_from_entry and contact_proj < entry_proj)):
-            min_distance = distance_metric
-            next_contact = contact
-            next_contact_id = ind
+            distance_prior <= max_distance_prior*avg_distance):
+            if distance_from_entry is None or (distance_entry >= distance_from_entry and contact_proj < entry_proj):
+                min_distance = distance_metric
+                next_contact = contact
+                next_contact_id = ind
     if next_contact_id is not None:
         # print(contacts[next_contact_id,-1], '\n')
         # print(next_contact_id, '\n')
