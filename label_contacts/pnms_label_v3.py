@@ -342,7 +342,7 @@ def run_segmentation_qc_new(entry_point,
                                                            min_distance_prior, 
                                                            avg_distance, 
                                                            entry_point,
-                                                          distance_from_entry=1.5 if len(found_contacts)>max_n_contacts else None)
+                                                          distance_from_entry=1.5 if len(found_contacts)>=max_n_contacts else None)
         else:
             next_contact = None
     print(f"Adjusted Mean Distance: {avg_distance}")
@@ -369,10 +369,11 @@ def create_electrode_mask(ct_data: np.ndarray, entry_target_vox: np.ndarray) -> 
 
     return merged_mask
 
-model_desc = 'May16_patch95_4layers_diceCE'
+model_desc = 'Jun17_patch32_4layers_diceCE'
 pnms_dir = f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms'
+patch_size = 'patch32'
 gt_dir = '/project/6050199/athurai3/seeg_data_final'
-test_dir = '/scratch/athurai3/val_final'
+test_dir = '/scratch/athurai3/val_thesis'
 
 adtech_dict = dict(
     [(3,"RD10R-SP03X"), (4,"RD10R-SP04X"), (5,"RD10R-SP05X"), (6,"RD10R-SP06X"), (7,"RD10R-SP07X")]
@@ -388,8 +389,8 @@ print(sorted(subjects))
      
 for sub in sorted(subjects)[:-1]:
     print(sub)
-    final_fname_t1 = f'{pnms_dir}/{sub}_space-T1w_desc-unet_pnms_nomask.fcsv'
-    orig_pnms = pd.read_csv(f'{pnms_dir}/{sub}_prob_nms.fcsv', skiprows=3, header = None)
+    final_fname_t1 = f'{pnms_dir}/{sub}_space-T1w_desc-{patch_size}_unet_pnms.fcsv'
+    orig_pnms = pd.read_csv(f'{pnms_dir}/{sub}_desc-{patch_size}_unet_pnms.fcsv', skiprows=3, header = None)
     ct_t1_trans = np.loadtxt(f'{gt_dir}/{sub}/{sub}_desc-rigid_from-ct_to-T1w_type-ras_ses-post_xfm.txt')
     
     # TODO: Update paths
@@ -424,11 +425,12 @@ for sub in sorted(subjects)[:-1]:
     """
     First stage: Masking filtering
     """
-    electrode_mask = nib.load(f'/scratch/athurai3/preproc_final/{sub}/{sub}_res-0p4mm_desc-electrode_mask.nii.gz')
-    electrode_mask = electrode_mask.get_fdata()
+    # electrode_mask = nib.load(f'/scratch/athurai3/preproc_final/{sub}/{sub}_res-0p4mm_desc-electrode_mask.nii.gz')
+    # electrode_mask = electrode_mask.get_fdata()
 
-    filtered_coords = coords_interest[electrode_mask[transformed_coords[:,0], transformed_coords[:,1], transformed_coords[:,2]] > 0]
+    #filtered_coords = coords_interest[electrode_mask[transformed_coords[:,0], transformed_coords[:,1], transformed_coords[:,2]] > 0]
     
+    filtered_coords = coords_interest
     """
     Second stage: Line filtering
     """
@@ -440,7 +442,7 @@ for sub in sorted(subjects)[:-1]:
         # Label for the contact
         label = entry_target[i,-1]
         print(label, flush=True)        
-        found_contacts, _ = run_segmentation_qc_new(entry_point = entry_target_coords[i+1, :],
+        found_contacts, avg_distance = run_segmentation_qc_new(entry_point = entry_target_coords[i+1, :],
                                                                target_point = entry_target_coords[i, :],
                                                                contacts = filtered_coords, 
                                                                max_angle_target = 35, 
@@ -452,8 +454,15 @@ for sub in sorted(subjects)[:-1]:
     # Find the max_n_contacts
     print(n_contacts)
     elements, count = np.unique(n_contacts, return_counts=True)
-    max_n_contacts = np.max(elements[count>1])
+    # Flip them to order from higher to lower
+    elements = np.flip(elements)
+    count = np.flip(count)
+    # Find cumulative sum. Indicates the number of channels with values higher than a number
+    cumcount = np.cumsum(count)
+    max_n_contacts = np.max(elements[np.cumsum(count)>=int(len(n_contacts)*0.3)])
     print('Number of contacts for electrode: ', max_n_contacts)
+    # max_n_contacts = np.max(elements[count>1])
+    # print('Number of contacts for electrode: ', max_n_contacts)
     
     # Now repeat to find the actual points
     # Compute for each pair of entry-target

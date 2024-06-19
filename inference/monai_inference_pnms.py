@@ -28,7 +28,7 @@ import glob
 import pandas as pd
 import numpy as np
 
-model_desc = 'Mar16_patch95_4layers_diceCE'
+model_desc = 'Jun17_patch95_4layers_diceCE'
 model_fname = f'/scratch/athurai3/monai_outputs/UNET/{model_desc}/checkpoint.pt'
 
 def df_to_fcsv(input_df, output_fcsv):
@@ -43,9 +43,9 @@ def df_to_fcsv(input_df, output_fcsv):
     
     for idx,ifid in input_df.iterrows():
         out_df['node_id'].append(idx+1)
-		out_df['x'].append(ifid.iloc[0])
-		out_df['y'].append(ifid.iloc[1])
-		out_df['z'].append(ifid.iloc[2])
+        out_df['x'].append(ifid.iloc[0])
+        out_df['y'].append(ifid.iloc[1])
+        out_df['z'].append(ifid.iloc[2])
         out_df['ow'].append(0)
         out_df['ox'].append(0)
         out_df['oy'].append(0)
@@ -53,22 +53,12 @@ def df_to_fcsv(input_df, output_fcsv):
         out_df['vis'].append(1)
         out_df['sel'].append(1)
         out_df['lock'].append(1)
-		out_df['label'].append(str(ifid.iloc[3]))
+        out_df['label'].append(str(idx+1)) #no label for points for now
         out_df['description'].append('')
         out_df['associatedNodeID'].append('')
 
     out_df=pd.DataFrame(out_df)
     out_df.to_csv(output_fcsv, sep=',', index=False, lineterminator="", mode='a', header=False, float_format = '%.3f')
-
-# parser = argparse.ArgumentParser(description='PyTorch Example')
-# parser.add_argument('--disable-cuda', action='store_true',
-#                     help='Disable CUDA')
-# args = parser.parse_args()
-# args.device = None
-# if not args.disable_cuda and torch.cuda.is_available():
-#     args.device = torch.device('cuda')
-# else:
-#     args.device = torch.device('cpu')
 
 import time
 
@@ -85,12 +75,12 @@ model = UNet(
     norm=Norm.BATCH,
 ).to(device)
 
-test_dir = '/scratch/athurai3/val_final'
+test_dir = '/scratch/athurai3/val_thesis'
 orig_dir = '/scratch/athurai3/preproc_final'
 
-# subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
-# subjects = sorted(subjects)
-subjects = ['sub-P020']  #identify which specific subjects to run model on
+subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
+subjects = sorted(subjects)
+# subjects = ['sub-P020']  #identify which specific subjects to run model on
 
 test_ct = []
 test_subjects = []
@@ -122,7 +112,7 @@ post_transforms = Compose(
 
 probNMS_transform = Compose(
      [
-        ProbNMS(spatial_dims = 3, box_size = [10,10,10])  
+        ProbNMS(spatial_dims = 3, box_size = [10,10,10])
      ]
 )
 
@@ -134,7 +124,7 @@ model.eval()
 with torch.no_grad():
     for test_img in test_loader:
         test_inputs = test_img['image'].to('cpu')
-        roi_size = (96, 96, 96)
+        roi_size = (96, 96, 96) #change to reflect patch size model was trained on
         sw_batch_size = 8
         pred_img = sliding_window_inference(inputs = test_inputs, 
                                             roi_size=roi_size, 
@@ -145,16 +135,11 @@ with torch.no_grad():
                                             sw_device = device, 
                                             device = device, 
                                             progress=True)
-        pred_img = post_transforms(pred_img)
-        pred_imgs.append(pred_img.cpu().numpy())
+        pred_img = probNMS_transform(pred_img[0][0]) #to get coordinates
+        pred_imgs.append(pred_img)
+        #pred_img = post_transforms(pred_img) #if wanting the image
+        #pred_imgs.append(pred_img.cpu().numpy())
         del pred_img
-
-
-end = time.time()
-
-time_pred = end-start
-print('Time for Prediction', time_pred)
-print('Avg Time Per Subject', time_pred/len(subjects))
 
 if not os.path.exists(f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms'):
     os.makedirs(f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms')
@@ -162,47 +147,56 @@ if not os.path.exists(f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms'):
 if not os.path.exists(f'/scratch/athurai3/monai_outputs/{model_desc}'):
     os.makedirs(f'/scratch/athurai3/monai_outputs/{model_desc}')
 
-# for sub in range(len(pred_imgs)):
-#     pred_test_pnms = probNMS_transform(pred_imgs[sub][0][0])
 
-#     print(test_ct[sub])
+#creating fcsv dataframes from prob_nms outputs to view in slicer
+patch_size = 'patch96'
 
-#     #print(pred_test_pnms.shape)
-#     file_name_pred = f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms/{test_subjects[sub]}_prob_nms.fcsv'
-#     orig_test = nib.load(test_ct[sub])
-#     print(f'creating {test_subjects[sub]} prediction')
+for sub in range(len(pred_imgs)):
+    pred_test_pnms = pred_imgs[sub]
+    print(test_ct[sub])
 
-#     M = orig_test.affine[:3,:3]
-#     abc = orig_test.affine[:3,3]
+    #print(pred_test_pnms.shape)
+    file_name_pred = f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms/{test_subjects[sub]}_desc-{patch_size}_unet_pnms.fcsv'
+    orig_test = nib.load(test_ct[sub])
+    print(f'creating {test_subjects[sub]} prediction')
 
-#     pred_test_pnms_df = pd.DataFrame(pred_test_pnms, columns=['probability', 'x', 'y', 'z'])
+    M = orig_test.affine[:3,:3]
+    abc = orig_test.affine[:3,3]
 
-#     coords = pred_test_pnms_df[['x', 'y', 'z']].to_numpy()
+    pred_test_pnms_df = pd.DataFrame(pred_test_pnms, columns=['probability', 'x', 'y', 'z'])
 
-#     #print(coords)
+    coords = pred_test_pnms_df[['x', 'y', 'z']].to_numpy()
 
-#     #create empty array to fill with transformed coordinates
-#     transformed_coords = np.zeros(coords.shape)
-#     print('Transforming from voxel to coordinate space')
-#     #apply tranformations row by row
-#     for i in range(len(transformed_coords)):
-#         vec = coords[i,:]
-#         tvec = M.dot(vec) + abc
-#         transformed_coords[i,:] = tvec[:3]
+    #print(coords)
 
-#     ras_points = pd.DataFrame(transformed_coords, columns = ['x','y','z'])
+    #create empty array to fill with transformed coordinates
+    transformed_coords = np.zeros(coords.shape)
+    print('Transforming from voxel to coordinate space')
+    #apply tranformations row by row
+    for i in range(len(transformed_coords)):
+        vec = coords[i,:]
+        tvec = M.dot(vec) + abc
+        transformed_coords[i,:] = tvec[:3]
 
-#     print(ras_points)
+    ras_points = pd.DataFrame(transformed_coords, columns = ['x','y','z'])
+
+    print(ras_points)
         
-#     df_to_fcsv(ras_points, file_name_pred)
+    df_to_fcsv(ras_points, file_name_pred)
 
-post_transforms(pred_imgs)
+#creating nifti images
 
-for i in range(len(pred_imgs)):
-    prediction = pred_imgs[i][0][0]
-    file_name_pred = f'/scratch/athurai3/monai_outputs/{model_desc}/{test_subjects[i]}_res-0p4mm_desc-z_norm_pred_ct.nii.gz'
-    orig_test = nib.load(test_ct[i])
-    print(f'creating {subjects[i]} prediction')
-    file = nib.Nifti1Image(prediction, affine = orig_test.affine, header = orig_test.header)
-    nib.save(file, file_name_pred)
-    print(f'{subjects[i]} complete')
+# for i in range(len(pred_imgs)):
+#     prediction = pred_imgs[i][0][0]
+#     file_name_pred = f'/scratch/athurai3/monai_outputs/{model_desc}/{test_subjects[i]}_res-0p4mm_desc-pred_ct.nii.gz'
+#     orig_test = nib.load(test_ct[i])
+#     print(f'creating {subjects[i]} prediction')
+#     file = nib.Nifti1Image(prediction, affine = orig_test.affine, header = orig_test.header)
+#     nib.save(file, file_name_pred)
+#     print(f'{subjects[i]} complete')
+
+end = time.time()
+
+time_pred = end-start
+print('Time for Prediction', time_pred)
+print('Avg Time Per Subject', time_pred/len(subjects))
