@@ -28,8 +28,8 @@ import glob
 import pandas as pd
 import numpy as np
 
-model_desc = 'Jun17_patch95_4layers_diceCE'
-model_fname = f'/scratch/athurai3/monai_outputs/UNET/{model_desc}/checkpoint.pt'
+model_desc = 'Jun17_patch64_4layers_diceCE'
+model_fname = f'/project/6050199/athurai3/{model_desc}/checkpoint.pt'
 
 def df_to_fcsv(input_df, output_fcsv):
     with open(output_fcsv, 'w') as fid:
@@ -75,8 +75,9 @@ model = UNet(
     norm=Norm.BATCH,
 ).to(device)
 
-test_dir = '/scratch/athurai3/val_thesis'
+test_dir = '/scratch/athurai3/test_thesis'
 orig_dir = '/scratch/athurai3/preproc_final'
+output_dir = '/scratch/athurai3/test_predictions'
 
 subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
 subjects = sorted(subjects)
@@ -93,6 +94,8 @@ for subject in subjects:
 
 test_data = [{"image": image} for image in test_ct]
 
+# test_data = [{"image": test_ct}]
+
 test_transforms = Compose( #loading full image
     [
         LoadImaged(keys=["image"]),
@@ -100,7 +103,7 @@ test_transforms = Compose( #loading full image
 
 test_ds = Dataset(data = test_data, transform = test_transforms)
 
-test_loader = DataLoader(test_ds, batch_size = 1, num_workers = 1)
+test_loader = DataLoader(test_ds, batch_size = 1)
 
 
 post_transforms = Compose(
@@ -117,14 +120,13 @@ probNMS_transform = Compose(
 )
 
 pred_imgs = []
-model.load_state_dict(torch.load(model_fname, 
-                                 map_location=torch.device(device)))
+model.load_state_dict(torch.load(model_fname))
 model.eval()
 
 with torch.no_grad():
-    for test_img in test_loader:
-        test_inputs = test_img['image'].to('cpu')
-        roi_size = (96, 96, 96) #change to reflect patch size model was trained on
+    for i, test_img in enumerate(test_loader):
+        test_inputs = test_img['image'].to(device)
+        roi_size = (64, 64, 64) #change to reflect patch size model was trained on
         sw_batch_size = 8
         pred_img = sliding_window_inference(inputs = test_inputs, 
                                             roi_size=roi_size, 
@@ -135,28 +137,28 @@ with torch.no_grad():
                                             sw_device = device, 
                                             device = device, 
                                             progress=True)
-        pred_img = probNMS_transform(pred_img[0][0]) #to get coordinates
+        pred_img = probNMS_transform(pred_img[0][0].cpu().numpy()) #to get coordinates
         pred_imgs.append(pred_img)
         #pred_img = post_transforms(pred_img) #if wanting the image
         #pred_imgs.append(pred_img.cpu().numpy())
         del pred_img
 
-if not os.path.exists(f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms'):
-    os.makedirs(f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms')
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
-if not os.path.exists(f'/scratch/athurai3/monai_outputs/{model_desc}'):
-    os.makedirs(f'/scratch/athurai3/monai_outputs/{model_desc}')
+if not os.path.exists(f'{output_dir}/{model_desc}/prob_nms'):
+    os.makedirs(f'{output_dir}/{model_desc}/prob_nms')
 
 
 #creating fcsv dataframes from prob_nms outputs to view in slicer
-patch_size = 'patch96'
+patch_size = 'patch64'
 
 for sub in range(len(pred_imgs)):
     pred_test_pnms = pred_imgs[sub]
     print(test_ct[sub])
 
     #print(pred_test_pnms.shape)
-    file_name_pred = f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms/{test_subjects[sub]}_desc-{patch_size}_unet_pnms.fcsv'
+    file_name_pred = f'{output_dir}/{model_desc}/prob_nms/{test_subjects[sub]}_desc-{patch_size}_unet_pnms.fcsv'
     orig_test = nib.load(test_ct[sub])
     print(f'creating {test_subjects[sub]} prediction')
 

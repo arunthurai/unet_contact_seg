@@ -5,18 +5,18 @@
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=48G
-#SBATCH --time=4:00:00
+#SBATCH --time=6:00:00
 
 
 echo "begin"
-#source $(kpy _kpy_wrapper)
+source $(kpy _kpy_wrapper)
 
 nvidia-smi
 
-module load cuda cudnn
+kpy load monai_unet
 
-source /scratch/athurai3/sandbox_contact_seg/.monai_hdt/bin/activate
+module load cuda cudnn
 
 echo "beginning inference"
 
-python3 /scratch/athurai3/sandbox_contact_seg/monai_inference_pnms.py
+python3 /project/6050199/athurai3/unet_contact_seg/inference/monai_inference_pnms.py

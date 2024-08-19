@@ -1,0 +1,5 @@
+training time: 64244.4897942543
+ Trainable Parameters: 7750087
+training loss: 0.20629598721669815
+ validation loss: 0.24277255746225515
+validation dice metric: 0.7355797290802002

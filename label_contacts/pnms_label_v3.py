@@ -369,11 +369,11 @@ def create_electrode_mask(ct_data: np.ndarray, entry_target_vox: np.ndarray) -> 
 
     return merged_mask
 
-model_desc = 'Jun17_patch32_4layers_diceCE'
-pnms_dir = f'/scratch/athurai3/monai_outputs/{model_desc}/prob_nms'
-patch_size = 'patch32'
+model_desc = 'Jun17_patch64_4layers_diceCE'
+pnms_dir = f'/scratch/athurai3/test_predictions/{model_desc}/prob_nms'
+patch_size = 'patch64'
 gt_dir = '/project/6050199/athurai3/seeg_data_final'
-test_dir = '/scratch/athurai3/val_thesis'
+test_dir = '/scratch/athurai3/test_thesis'
 
 adtech_dict = dict(
     [(3,"RD10R-SP03X"), (4,"RD10R-SP04X"), (5,"RD10R-SP05X"), (6,"RD10R-SP06X"), (7,"RD10R-SP07X")]
@@ -387,7 +387,7 @@ subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in ident
 print(subjects)
 print(sorted(subjects))
      
-for sub in sorted(subjects)[:-1]:
+for sub in sorted(subjects):
     print(sub)
     final_fname_t1 = f'{pnms_dir}/{sub}_space-T1w_desc-{patch_size}_unet_pnms.fcsv'
     orig_pnms = pd.read_csv(f'{pnms_dir}/{sub}_desc-{patch_size}_unet_pnms.fcsv', skiprows=3, header = None)

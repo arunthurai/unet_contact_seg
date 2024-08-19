@@ -15,3 +15,4 @@ monai_c3d_implementation/.ipynb_checkpoints*
 data/
 *.nii.gz
 *.zip
+data_split_clae/*

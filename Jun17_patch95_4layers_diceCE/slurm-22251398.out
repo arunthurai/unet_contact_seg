@@ -1,0 +1,649 @@
+begin
+Copying Files to SLURM_TMPDIR
+Files Copied to SLURM_TMPDIR
+Tue Jun 18 06:17:39 2024       
++---------------------------------------------------------------------------------------+
+| NVIDIA-SMI 535.129.03             Driver Version: 535.129.03   CUDA Version: 12.2     |
+|-----------------------------------------+----------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |         Memory-Usage | GPU-Util  Compute M. |
+|                                         |                      |               MIG M. |
+|=========================================+======================+======================|
+|   0  Tesla P100-PCIE-12GB           Off | 00000000:04:00.0 Off |                    0 |
+| N/A   36C    P0              25W / 250W |      0MiB / 12288MiB |      0%      Default |
+|                                         |                      |                  N/A |
++-----------------------------------------+----------------------+----------------------+
+|   1  Tesla P100-PCIE-12GB           Off | 00000000:83:00.0 Off |                    0 |
+| N/A   37C    P0              25W / 250W |      0MiB / 12288MiB |      0%      Default |
+|                                         |                      |                  N/A |
++-----------------------------------------+----------------------+----------------------+
+                                                                                         
++---------------------------------------------------------------------------------------+
+| Processes:                                                                            |
+|  GPU   GI   CI        PID   Type   Process name                            GPU Memory |
+|        ID   ID                                                             Usage      |
+|=======================================================================================|
+|  No running processes found                                                           |
++---------------------------------------------------------------------------------------+
+Unpacking venv 'monai_unet'
+Updating paths
+training with patch size 96, diceCE loss
+beginning training
+42532659000
+6859000
+6201
+Training Array Shape: (6201, 95, 95, 95, 2)
+5267712000
+6859000
+768
+Validation Array Shape: (768, 95, 95, 95, 2)
+Loading dataset:   0%|          | 0/4340 [00:00<?, ?it/s]Loading dataset:   0%|          | 8/4340 [00:00<00:58, 74.05it/s]Loading dataset:   0%|          | 17/4340 [00:00<00:52, 82.13it/s]Loading dataset:   1%|          | 26/4340 [00:00<00:50, 85.22it/s]Loading dataset:   1%|          | 35/4340 [00:00<00:49, 86.84it/s]Loading dataset:   1%|          | 44/4340 [00:00<00:49, 87.38it/s]Loading dataset:   1%|          | 54/4340 [00:00<00:47, 90.44it/s]Loading dataset:   1%|▏         | 64/4340 [00:00<00:45, 93.11it/s]Loading dataset:   2%|▏         | 74/4340 [00:00<00:44, 94.81it/s]Loading dataset:   2%|▏         | 84/4340 [00:00<00:44, 95.84it/s]Loading dataset:   2%|▏         | 94/4340 [00:01<00:46, 91.77it/s]Loading dataset:   2%|▏         | 104/4340 [00:01<00:45, 92.76it/s]Loading dataset:   3%|▎         | 114/4340 [00:01<00:45, 93.54it/s]Loading dataset:   3%|▎         | 124/4340 [00:01<00:44, 94.67it/s]Loading dataset:   3%|▎         | 134/4340 [00:01<00:43, 95.83it/s]Loading dataset:   3%|▎         | 144/4340 [00:01<01:02, 66.83it/s]Loading dataset:   4%|▎         | 155/4340 [00:01<00:55, 75.50it/s]Loading dataset:   4%|▍         | 166/4340 [00:01<00:50, 82.68it/s]Loading dataset:   4%|▍         | 177/4340 [00:02<00:47, 88.31it/s]Loading dataset:   4%|▍         | 188/4340 [00:02<00:44, 93.61it/s]Loading dataset:   5%|▍         | 199/4340 [00:02<00:42, 97.79it/s]Loading dataset:   5%|▍         | 210/4340 [00:02<00:41, 100.61it/s]Loading dataset:   5%|▌         | 221/4340 [00:02<00:40, 102.93it/s]Loading dataset:   5%|▌         | 232/4340 [00:02<00:39, 104.38it/s]Loading dataset:   6%|▌         | 243/4340 [00:02<00:38, 105.43it/s]Loading dataset:   6%|▌         | 254/4340 [00:02<00:38, 106.02it/s]Loading dataset:   6%|▌         | 265/4340 [00:02<00:38, 105.61it/s]Loading dataset:   6%|▋         | 276/4340 [00:02<00:38, 105.14it/s]Loading dataset:   7%|▋         | 287/4340 [00:03<00:38, 106.08it/s]Loading dataset:   7%|▋         | 298/4340 [00:03<00:37, 106.97it/s]Loading dataset:   7%|▋         | 309/4340 [00:03<00:37, 107.36it/s]Loading dataset:   7%|▋         | 320/4340 [00:03<00:37, 106.59it/s]Loading dataset:   8%|▊         | 331/4340 [00:03<00:37, 105.96it/s]Loading dataset:   8%|▊         | 342/4340 [00:03<00:37, 105.36it/s]Loading dataset:   8%|▊         | 353/4340 [00:03<00:37, 105.19it/s]Loading dataset:   8%|▊         | 364/4340 [00:03<00:37, 105.06it/s]Loading dataset:   9%|▊         | 375/4340 [00:03<00:37, 104.85it/s]Loading dataset:   9%|▉         | 386/4340 [00:03<00:37, 104.93it/s]Loading dataset:   9%|▉         | 397/4340 [00:04<00:37, 105.08it/s]Loading dataset:   9%|▉         | 408/4340 [00:04<00:37, 104.93it/s]Loading dataset:  10%|▉         | 419/4340 [00:04<00:37, 104.84it/s]Loading dataset:  10%|▉         | 430/4340 [00:04<00:37, 104.89it/s]Loading dataset:  10%|█         | 441/4340 [00:04<00:37, 104.90it/s]Loading dataset:  10%|█         | 452/4340 [00:04<00:37, 104.98it/s]Loading dataset:  11%|█         | 463/4340 [00:04<00:36, 104.99it/s]Loading dataset:  11%|█         | 474/4340 [00:04<00:36, 104.87it/s]Loading dataset:  11%|█         | 485/4340 [00:04<00:36, 104.90it/s]Loading dataset:  11%|█▏        | 496/4340 [00:05<00:36, 105.02it/s]Loading dataset:  12%|█▏        | 507/4340 [00:05<00:36, 104.74it/s]Loading dataset:  12%|█▏        | 518/4340 [00:05<00:36, 104.67it/s]Loading dataset:  12%|█▏        | 529/4340 [00:05<00:36, 104.72it/s]Loading dataset:  12%|█▏        | 540/4340 [00:05<00:36, 104.73it/s]Loading dataset:  13%|█▎        | 551/4340 [00:05<00:36, 104.79it/s]Loading dataset:  13%|█▎        | 562/4340 [00:05<00:36, 104.79it/s]Loading dataset:  13%|█▎        | 573/4340 [00:05<00:36, 104.51it/s]Loading dataset:  13%|█▎        | 584/4340 [00:05<00:36, 104.23it/s]Loading dataset:  14%|█▎        | 595/4340 [00:05<00:35, 104.50it/s]Loading dataset:  14%|█▍        | 606/4340 [00:06<00:35, 104.36it/s]Loading dataset:  14%|█▍        | 617/4340 [00:06<00:35, 104.65it/s]Loading dataset:  14%|█▍        | 628/4340 [00:06<00:35, 104.83it/s]Loading dataset:  15%|█▍        | 639/4340 [00:06<00:35, 105.03it/s]Loading dataset:  15%|█▍        | 650/4340 [00:06<00:35, 105.15it/s]Loading dataset:  15%|█▌        | 661/4340 [00:06<00:34, 105.27it/s]Loading dataset:  15%|█▌        | 672/4340 [00:06<00:34, 105.20it/s]Loading dataset:  16%|█▌        | 683/4340 [00:06<00:34, 105.31it/s]Loading dataset:  16%|█▌        | 694/4340 [00:06<00:34, 105.51it/s]Loading dataset:  16%|█▌        | 705/4340 [00:07<00:34, 105.31it/s]Loading dataset:  16%|█▋        | 716/4340 [00:07<00:34, 105.37it/s]Loading dataset:  17%|█▋        | 727/4340 [00:07<00:34, 105.44it/s]Loading dataset:  17%|█▋        | 738/4340 [00:07<00:34, 105.48it/s]Loading dataset:  17%|█▋        | 749/4340 [00:07<00:34, 105.52it/s]Loading dataset:  18%|█▊        | 760/4340 [00:07<00:33, 105.54it/s]Loading dataset:  18%|█▊        | 771/4340 [00:07<00:33, 105.41it/s]Loading dataset:  18%|█▊        | 782/4340 [00:07<00:33, 105.43it/s]Loading dataset:  18%|█▊        | 793/4340 [00:07<00:33, 105.63it/s]Loading dataset:  19%|█▊        | 804/4340 [00:07<00:33, 105.42it/s]Loading dataset:  19%|█▉        | 815/4340 [00:08<00:33, 105.42it/s]Loading dataset:  19%|█▉        | 826/4340 [00:08<00:33, 105.45it/s]Loading dataset:  19%|█▉        | 837/4340 [00:08<00:33, 105.25it/s]Loading dataset:  20%|█▉        | 848/4340 [00:08<00:33, 105.37it/s]Loading dataset:  20%|█▉        | 859/4340 [00:08<00:33, 105.43it/s]Loading dataset:  20%|██        | 870/4340 [00:08<00:32, 105.37it/s]Loading dataset:  20%|██        | 881/4340 [00:08<00:32, 105.38it/s]Loading dataset:  21%|██        | 892/4340 [00:08<00:32, 105.51it/s]Loading dataset:  21%|██        | 903/4340 [00:08<00:32, 105.13it/s]Loading dataset:  21%|██        | 914/4340 [00:09<00:32, 105.02it/s]Loading dataset:  21%|██▏       | 925/4340 [00:09<00:32, 104.94it/s]Loading dataset:  22%|██▏       | 936/4340 [00:09<00:32, 104.96it/s]Loading dataset:  22%|██▏       | 947/4340 [00:09<00:32, 104.96it/s]Loading dataset:  22%|██▏       | 958/4340 [00:09<00:32, 104.91it/s]Loading dataset:  22%|██▏       | 969/4340 [00:09<00:32, 104.70it/s]Loading dataset:  23%|██▎       | 980/4340 [00:09<00:32, 104.71it/s]Loading dataset:  23%|██▎       | 991/4340 [00:09<00:31, 104.78it/s]Loading dataset:  23%|██▎       | 1002/4340 [00:09<00:31, 104.73it/s]Loading dataset:  23%|██▎       | 1013/4340 [00:09<00:31, 104.89it/s]Loading dataset:  24%|██▎       | 1024/4340 [00:10<00:31, 104.88it/s]Loading dataset:  24%|██▍       | 1035/4340 [00:10<00:31, 104.96it/s]Loading dataset:  24%|██▍       | 1046/4340 [00:10<00:31, 105.04it/s]Loading dataset:  24%|██▍       | 1057/4340 [00:10<00:31, 105.06it/s]Loading dataset:  25%|██▍       | 1068/4340 [00:10<00:31, 104.91it/s]Loading dataset:  25%|██▍       | 1079/4340 [00:10<00:31, 104.91it/s]Loading dataset:  25%|██▌       | 1090/4340 [00:10<00:30, 105.01it/s]Loading dataset:  25%|██▌       | 1101/4340 [00:10<00:30, 105.11it/s]Loading dataset:  26%|██▌       | 1112/4340 [00:10<00:30, 105.27it/s]Loading dataset:  26%|██▌       | 1123/4340 [00:11<00:30, 105.39it/s]Loading dataset:  26%|██▌       | 1134/4340 [00:11<00:33, 96.19it/s] Loading dataset:  26%|██▋       | 1144/4340 [00:11<00:35, 89.60it/s]Loading dataset:  27%|██▋       | 1154/4340 [00:11<00:36, 86.28it/s]Loading dataset:  27%|██▋       | 1163/4340 [00:11<00:37, 83.90it/s]Loading dataset:  27%|██▋       | 1172/4340 [00:11<00:37, 83.44it/s]Loading dataset:  27%|██▋       | 1182/4340 [00:11<00:36, 85.61it/s]Loading dataset:  27%|██▋       | 1192/4340 [00:11<00:36, 87.30it/s]Loading dataset:  28%|██▊       | 1202/4340 [00:11<00:35, 88.37it/s]Loading dataset:  28%|██▊       | 1212/4340 [00:12<00:35, 89.14it/s]Loading dataset:  28%|██▊       | 1222/4340 [00:12<00:34, 89.83it/s]Loading dataset:  28%|██▊       | 1232/4340 [00:12<00:34, 90.19it/s]Loading dataset:  29%|██▊       | 1242/4340 [00:12<00:34, 90.57it/s]Loading dataset:  29%|██▉       | 1252/4340 [00:12<00:33, 90.83it/s]Loading dataset:  29%|██▉       | 1262/4340 [00:12<00:33, 90.90it/s]Loading dataset:  29%|██▉       | 1272/4340 [00:12<00:33, 90.91it/s]Loading dataset:  30%|██▉       | 1282/4340 [00:12<00:33, 91.16it/s]Loading dataset:  30%|██▉       | 1292/4340 [00:12<00:33, 91.08it/s]Loading dataset:  30%|███       | 1302/4340 [00:13<00:33, 91.11it/s]Loading dataset:  30%|███       | 1312/4340 [00:13<00:33, 91.20it/s]Loading dataset:  30%|███       | 1322/4340 [00:13<00:33, 90.91it/s]Loading dataset:  31%|███       | 1332/4340 [00:13<00:33, 89.84it/s]Loading dataset:  31%|███       | 1341/4340 [00:13<00:33, 89.48it/s]Loading dataset:  31%|███       | 1350/4340 [00:13<00:33, 88.84it/s]Loading dataset:  31%|███▏      | 1359/4340 [00:13<00:33, 88.74it/s]Loading dataset:  32%|███▏      | 1368/4340 [00:13<00:33, 87.85it/s]Loading dataset:  32%|███▏      | 1377/4340 [00:13<00:33, 88.05it/s]Loading dataset:  32%|███▏      | 1386/4340 [00:14<00:33, 87.70it/s]Loading dataset:  32%|███▏      | 1395/4340 [00:14<00:33, 87.90it/s]Loading dataset:  32%|███▏      | 1404/4340 [00:14<00:33, 87.68it/s]Loading dataset:  33%|███▎      | 1413/4340 [00:14<00:33, 87.91it/s]Loading dataset:  33%|███▎      | 1422/4340 [00:14<00:33, 88.42it/s]Loading dataset:  33%|███▎      | 1431/4340 [00:14<00:32, 88.19it/s]Loading dataset:  33%|███▎      | 1440/4340 [00:14<00:32, 88.47it/s]Loading dataset:  33%|███▎      | 1449/4340 [00:14<00:32, 88.62it/s]Loading dataset:  34%|███▎      | 1458/4340 [00:14<00:32, 88.77it/s]Loading dataset:  34%|███▍      | 1467/4340 [00:14<00:32, 88.80it/s]Loading dataset:  34%|███▍      | 1476/4340 [00:15<00:32, 88.85it/s]Loading dataset:  34%|███▍      | 1485/4340 [00:15<00:32, 88.92it/s]Loading dataset:  34%|███▍      | 1494/4340 [00:15<00:31, 88.95it/s]Loading dataset:  35%|███▍      | 1503/4340 [00:15<00:31, 89.04it/s]Loading dataset:  35%|███▍      | 1512/4340 [00:15<00:31, 89.05it/s]Loading dataset:  35%|███▌      | 1521/4340 [00:15<00:31, 89.10it/s]Loading dataset:  35%|███▌      | 1530/4340 [00:15<00:31, 89.13it/s]Loading dataset:  35%|███▌      | 1539/4340 [00:15<00:31, 89.14it/s]Loading dataset:  36%|███▌      | 1549/4340 [00:15<00:31, 90.01it/s]Loading dataset:  36%|███▌      | 1559/4340 [00:15<00:30, 91.71it/s]Loading dataset:  36%|███▌      | 1569/4340 [00:16<00:29, 92.91it/s]Loading dataset:  36%|███▋      | 1579/4340 [00:16<00:29, 93.93it/s]Loading dataset:  37%|███▋      | 1589/4340 [00:16<00:29, 94.47it/s]Loading dataset:  37%|███▋      | 1599/4340 [00:16<00:28, 94.91it/s]Loading dataset:  37%|███▋      | 1609/4340 [00:16<00:28, 95.37it/s]Loading dataset:  37%|███▋      | 1619/4340 [00:16<00:28, 95.52it/s]Loading dataset:  38%|███▊      | 1629/4340 [00:16<00:28, 95.75it/s]Loading dataset:  38%|███▊      | 1639/4340 [00:16<00:28, 95.92it/s]Loading dataset:  38%|███▊      | 1649/4340 [00:16<00:28, 95.94it/s]Loading dataset:  38%|███▊      | 1659/4340 [00:16<00:28, 95.69it/s]Loading dataset:  38%|███▊      | 1669/4340 [00:17<00:27, 95.84it/s]Loading dataset:  39%|███▊      | 1679/4340 [00:17<00:27, 95.90it/s]Loading dataset:  39%|███▉      | 1689/4340 [00:17<00:27, 95.87it/s]Loading dataset:  39%|███▉      | 1699/4340 [00:17<00:27, 96.07it/s]Loading dataset:  39%|███▉      | 1709/4340 [00:17<00:27, 96.00it/s]Loading dataset:  40%|███▉      | 1719/4340 [00:17<00:27, 96.06it/s]Loading dataset:  40%|███▉      | 1729/4340 [00:17<00:27, 96.10it/s]Loading dataset:  40%|████      | 1739/4340 [00:17<00:27, 96.04it/s]Loading dataset:  40%|████      | 1749/4340 [00:17<00:26, 96.00it/s]Loading dataset:  41%|████      | 1759/4340 [00:18<00:26, 96.05it/s]Loading dataset:  41%|████      | 1769/4340 [00:18<00:26, 95.98it/s]Loading dataset:  41%|████      | 1779/4340 [00:18<00:26, 96.01it/s]Loading dataset:  41%|████      | 1789/4340 [00:18<00:26, 96.11it/s]Loading dataset:  41%|████▏     | 1799/4340 [00:18<00:26, 96.04it/s]Loading dataset:  42%|████▏     | 1809/4340 [00:18<00:26, 96.11it/s]Loading dataset:  42%|████▏     | 1819/4340 [00:18<00:26, 96.20it/s]Loading dataset:  42%|████▏     | 1829/4340 [00:18<00:26, 96.10it/s]Loading dataset:  42%|████▏     | 1839/4340 [00:18<00:26, 95.99it/s]Loading dataset:  43%|████▎     | 1849/4340 [00:18<00:25, 96.07it/s]Loading dataset:  43%|████▎     | 1859/4340 [00:19<00:25, 96.07it/s]Loading dataset:  43%|████▎     | 1869/4340 [00:19<00:25, 95.99it/s]Loading dataset:  43%|████▎     | 1879/4340 [00:19<00:25, 96.04it/s]Loading dataset:  44%|████▎     | 1889/4340 [00:19<00:25, 96.08it/s]Loading dataset:  44%|████▍     | 1899/4340 [00:19<00:25, 96.15it/s]Loading dataset:  44%|████▍     | 1909/4340 [00:19<00:25, 94.38it/s]Loading dataset:  44%|████▍     | 1919/4340 [00:19<00:25, 94.82it/s]Loading dataset:  44%|████▍     | 1929/4340 [00:19<00:25, 95.12it/s]Loading dataset:  45%|████▍     | 1939/4340 [00:19<00:25, 94.38it/s]Loading dataset:  45%|████▍     | 1949/4340 [00:20<00:25, 94.64it/s]Loading dataset:  45%|████▌     | 1959/4340 [00:20<00:25, 94.37it/s]Loading dataset:  45%|████▌     | 1969/4340 [00:20<00:24, 94.94it/s]Loading dataset:  46%|████▌     | 1979/4340 [00:20<00:24, 94.92it/s]Loading dataset:  46%|████▌     | 1989/4340 [00:20<00:24, 95.37it/s]Loading dataset:  46%|████▌     | 1999/4340 [00:20<00:24, 95.37it/s]Loading dataset:  46%|████▋     | 2009/4340 [00:20<00:24, 95.58it/s]Loading dataset:  47%|████▋     | 2019/4340 [00:20<00:24, 95.45it/s]Loading dataset:  47%|████▋     | 2029/4340 [00:20<00:24, 95.54it/s]Loading dataset:  47%|████▋     | 2039/4340 [00:20<00:24, 95.63it/s]Loading dataset:  47%|████▋     | 2049/4340 [00:21<00:23, 95.53it/s]Loading dataset:  47%|████▋     | 2059/4340 [00:21<00:23, 95.55it/s]Loading dataset:  48%|████▊     | 2069/4340 [00:21<00:23, 95.65it/s]Loading dataset:  48%|████▊     | 2079/4340 [00:21<00:23, 95.70it/s]Loading dataset:  48%|████▊     | 2089/4340 [00:21<00:23, 95.71it/s]Loading dataset:  48%|████▊     | 2099/4340 [00:21<00:23, 95.81it/s]Loading dataset:  49%|████▊     | 2109/4340 [00:21<00:23, 95.74it/s]Loading dataset:  49%|████▉     | 2119/4340 [00:21<00:23, 95.70it/s]Loading dataset:  49%|████▉     | 2129/4340 [00:21<00:23, 95.79it/s]Loading dataset:  49%|████▉     | 2139/4340 [00:21<00:23, 95.65it/s]Loading dataset:  50%|████▉     | 2149/4340 [00:22<00:22, 95.69it/s]Loading dataset:  50%|████▉     | 2159/4340 [00:22<00:22, 95.78it/s]Loading dataset:  50%|████▉     | 2169/4340 [00:22<00:22, 95.78it/s]Loading dataset:  50%|█████     | 2179/4340 [00:22<00:22, 95.99it/s]Loading dataset:  50%|█████     | 2189/4340 [00:22<00:22, 95.79it/s]Loading dataset:  51%|█████     | 2199/4340 [00:22<00:22, 95.70it/s]Loading dataset:  51%|█████     | 2209/4340 [00:22<00:22, 95.92it/s]Loading dataset:  51%|█████     | 2219/4340 [00:22<00:22, 95.72it/s]Loading dataset:  51%|█████▏    | 2229/4340 [00:22<00:22, 95.61it/s]Loading dataset:  52%|█████▏    | 2239/4340 [00:23<00:21, 95.85it/s]Loading dataset:  52%|█████▏    | 2249/4340 [00:23<00:21, 95.41it/s]Loading dataset:  52%|█████▏    | 2259/4340 [00:23<00:21, 95.56it/s]Loading dataset:  52%|█████▏    | 2269/4340 [00:23<00:21, 95.74it/s]Loading dataset:  53%|█████▎    | 2279/4340 [00:23<00:21, 95.66it/s]Loading dataset:  53%|█████▎    | 2289/4340 [00:23<00:21, 95.63it/s]Loading dataset:  53%|█████▎    | 2299/4340 [00:23<00:21, 95.86it/s]Loading dataset:  53%|█████▎    | 2309/4340 [00:23<00:21, 95.72it/s]Loading dataset:  53%|█████▎    | 2319/4340 [00:23<00:21, 95.81it/s]Loading dataset:  54%|█████▎    | 2329/4340 [00:23<00:20, 95.79it/s]Loading dataset:  54%|█████▍    | 2339/4340 [00:24<00:20, 95.69it/s]Loading dataset:  54%|█████▍    | 2349/4340 [00:24<00:20, 95.85it/s]Loading dataset:  54%|█████▍    | 2359/4340 [00:24<00:20, 95.84it/s]Loading dataset:  55%|█████▍    | 2369/4340 [00:24<00:20, 95.72it/s]Loading dataset:  55%|█████▍    | 2379/4340 [00:24<00:20, 95.78it/s]Loading dataset:  55%|█████▌    | 2389/4340 [00:24<00:20, 95.86it/s]Loading dataset:  55%|█████▌    | 2399/4340 [00:24<00:20, 95.74it/s]Loading dataset:  56%|█████▌    | 2409/4340 [00:24<00:20, 95.80it/s]Loading dataset:  56%|█████▌    | 2419/4340 [00:24<00:20, 95.88it/s]Loading dataset:  56%|█████▌    | 2429/4340 [00:25<00:19, 95.70it/s]Loading dataset:  56%|█████▌    | 2439/4340 [00:25<00:19, 95.88it/s]Loading dataset:  56%|█████▋    | 2449/4340 [00:25<00:19, 95.91it/s]Loading dataset:  57%|█████▋    | 2459/4340 [00:25<00:19, 95.93it/s]Loading dataset:  57%|█████▋    | 2469/4340 [00:25<00:19, 95.78it/s]Loading dataset:  57%|█████▋    | 2479/4340 [00:25<00:19, 95.79it/s]Loading dataset:  57%|█████▋    | 2489/4340 [00:25<00:19, 95.82it/s]Loading dataset:  58%|█████▊    | 2499/4340 [00:25<00:19, 95.69it/s]Loading dataset:  58%|█████▊    | 2509/4340 [00:25<00:19, 95.73it/s]Loading dataset:  58%|█████▊    | 2519/4340 [00:25<00:19, 95.74it/s]Loading dataset:  58%|█████▊    | 2529/4340 [00:26<00:18, 95.57it/s]Loading dataset:  59%|█████▊    | 2539/4340 [00:26<00:19, 94.73it/s]Loading dataset:  59%|█████▊    | 2549/4340 [00:26<00:18, 95.10it/s]Loading dataset:  59%|█████▉    | 2560/4340 [00:26<00:18, 97.29it/s]Loading dataset:  59%|█████▉    | 2571/4340 [00:26<00:17, 100.68it/s]Loading dataset:  59%|█████▉    | 2582/4340 [00:26<00:17, 101.05it/s]Loading dataset:  60%|█████▉    | 2594/4340 [00:26<00:16, 103.93it/s]Loading dataset:  60%|██████    | 2605/4340 [00:26<00:16, 104.89it/s]Loading dataset:  60%|██████    | 2616/4340 [00:26<00:16, 104.09it/s]Loading dataset:  61%|██████    | 2627/4340 [00:27<00:16, 105.77it/s]Loading dataset:  61%|██████    | 2639/4340 [00:27<00:15, 107.00it/s]Loading dataset:  61%|██████    | 2650/4340 [00:27<00:15, 107.12it/s]Loading dataset:  61%|██████▏   | 2661/4340 [00:27<00:15, 107.66it/s]Loading dataset:  62%|██████▏   | 2672/4340 [00:27<00:15, 108.29it/s]Loading dataset:  62%|██████▏   | 2684/4340 [00:27<00:15, 108.94it/s]Loading dataset:  62%|██████▏   | 2695/4340 [00:27<00:15, 109.17it/s]Loading dataset:  62%|██████▏   | 2706/4340 [00:27<00:14, 109.22it/s]Loading dataset:  63%|██████▎   | 2717/4340 [00:27<00:14, 109.37it/s]Loading dataset:  63%|██████▎   | 2729/4340 [00:27<00:14, 109.51it/s]Loading dataset:  63%|██████▎   | 2740/4340 [00:28<00:14, 109.55it/s]Loading dataset:  63%|██████▎   | 2751/4340 [00:28<00:14, 109.48it/s]Loading dataset:  64%|██████▎   | 2762/4340 [00:28<00:14, 109.60it/s]Loading dataset:  64%|██████▍   | 2774/4340 [00:28<00:14, 109.67it/s]Loading dataset:  64%|██████▍   | 2785/4340 [00:28<00:14, 109.76it/s]Loading dataset:  64%|██████▍   | 2796/4340 [00:28<00:14, 109.61it/s]Loading dataset:  65%|██████▍   | 2807/4340 [00:28<00:13, 109.68it/s]Loading dataset:  65%|██████▍   | 2819/4340 [00:28<00:13, 109.86it/s]Loading dataset:  65%|██████▌   | 2830/4340 [00:28<00:13, 109.86it/s]Loading dataset:  65%|██████▌   | 2841/4340 [00:28<00:13, 109.70it/s]Loading dataset:  66%|██████▌   | 2852/4340 [00:29<00:13, 109.78it/s]Loading dataset:  66%|██████▌   | 2864/4340 [00:29<00:13, 109.85it/s]Loading dataset:  66%|██████▌   | 2875/4340 [00:29<00:13, 109.50it/s]Loading dataset:  66%|██████▋   | 2886/4340 [00:29<00:13, 109.45it/s]Loading dataset:  67%|██████▋   | 2897/4340 [00:29<00:13, 109.60it/s]Loading dataset:  67%|██████▋   | 2909/4340 [00:29<00:13, 109.85it/s]Loading dataset:  67%|██████▋   | 2920/4340 [00:29<00:12, 109.81it/s]Loading dataset:  68%|██████▊   | 2931/4340 [00:29<00:13, 108.02it/s]Loading dataset:  68%|██████▊   | 2943/4340 [00:29<00:12, 108.60it/s]Loading dataset:  68%|██████▊   | 2954/4340 [00:30<00:12, 107.24it/s]Loading dataset:  68%|██████▊   | 2965/4340 [00:30<00:12, 107.99it/s]Loading dataset:  69%|██████▊   | 2976/4340 [00:30<00:12, 107.07it/s]Loading dataset:  69%|██████▉   | 2987/4340 [00:30<00:12, 107.87it/s]Loading dataset:  69%|██████▉   | 2998/4340 [00:30<00:12, 107.07it/s]Loading dataset:  69%|██████▉   | 3009/4340 [00:30<00:12, 107.73it/s]Loading dataset:  70%|██████▉   | 3020/4340 [00:30<00:12, 108.38it/s]Loading dataset:  70%|██████▉   | 3031/4340 [00:30<00:12, 107.74it/s]Loading dataset:  70%|███████   | 3042/4340 [00:30<00:12, 108.11it/s]Loading dataset:  70%|███████   | 3053/4340 [00:30<00:11, 108.61it/s]Loading dataset:  71%|███████   | 3064/4340 [00:31<00:11, 108.88it/s]Loading dataset:  71%|███████   | 3075/4340 [00:31<00:11, 108.81it/s]Loading dataset:  71%|███████   | 3086/4340 [00:31<00:11, 109.00it/s]Loading dataset:  71%|███████▏  | 3098/4340 [00:31<00:11, 109.35it/s]Loading dataset:  72%|███████▏  | 3109/4340 [00:31<00:11, 109.37it/s]Loading dataset:  72%|███████▏  | 3120/4340 [00:31<00:11, 106.96it/s]Loading dataset:  72%|███████▏  | 3131/4340 [00:31<00:11, 105.03it/s]Loading dataset:  72%|███████▏  | 3142/4340 [00:31<00:11, 103.92it/s]Loading dataset:  73%|███████▎  | 3153/4340 [00:31<00:11, 102.88it/s]Loading dataset:  73%|███████▎  | 3164/4340 [00:31<00:11, 102.36it/s]Loading dataset:  73%|███████▎  | 3175/4340 [00:32<00:11, 101.93it/s]Loading dataset:  73%|███████▎  | 3186/4340 [00:32<00:11, 101.24it/s]Loading dataset:  74%|███████▎  | 3197/4340 [00:32<00:11, 101.13it/s]Loading dataset:  74%|███████▍  | 3208/4340 [00:32<00:11, 100.89it/s]Loading dataset:  74%|███████▍  | 3219/4340 [00:32<00:11, 100.85it/s]Loading dataset:  74%|███████▍  | 3230/4340 [00:32<00:11, 100.80it/s]Loading dataset:  75%|███████▍  | 3241/4340 [00:32<00:10, 100.95it/s]Loading dataset:  75%|███████▍  | 3252/4340 [00:32<00:10, 100.75it/s]Loading dataset:  75%|███████▌  | 3263/4340 [00:32<00:10, 100.79it/s]Loading dataset:  75%|███████▌  | 3274/4340 [00:33<00:10, 103.27it/s]Loading dataset:  76%|███████▌  | 3285/4340 [00:33<00:10, 104.90it/s]Loading dataset:  76%|███████▌  | 3296/4340 [00:33<00:09, 106.22it/s]Loading dataset:  76%|███████▌  | 3307/4340 [00:33<00:09, 107.19it/s]Loading dataset:  76%|███████▋  | 3318/4340 [00:33<00:09, 107.75it/s]Loading dataset:  77%|███████▋  | 3329/4340 [00:33<00:09, 108.26it/s]Loading dataset:  77%|███████▋  | 3341/4340 [00:33<00:09, 108.58it/s]Loading dataset:  77%|███████▋  | 3352/4340 [00:33<00:09, 108.91it/s]Loading dataset:  77%|███████▋  | 3363/4340 [00:33<00:08, 108.88it/s]Loading dataset:  78%|███████▊  | 3374/4340 [00:33<00:08, 109.04it/s]Loading dataset:  78%|███████▊  | 3385/4340 [00:34<00:08, 109.28it/s]Loading dataset:  78%|███████▊  | 3396/4340 [00:34<00:08, 109.21it/s]Loading dataset:  79%|███████▊  | 3407/4340 [00:34<00:08, 109.24it/s]Loading dataset:  79%|███████▉  | 3418/4340 [00:34<00:08, 109.25it/s]Loading dataset:  79%|███████▉  | 3429/4340 [00:34<00:08, 109.29it/s]Loading dataset:  79%|███████▉  | 3440/4340 [00:34<00:08, 109.30it/s]Loading dataset:  80%|███████▉  | 3451/4340 [00:34<00:08, 109.41it/s]Loading dataset:  80%|███████▉  | 3462/4340 [00:34<00:08, 109.22it/s]Loading dataset:  80%|████████  | 3473/4340 [00:34<00:07, 109.25it/s]Loading dataset:  80%|████████  | 3484/4340 [00:34<00:07, 109.41it/s]Loading dataset:  81%|████████  | 3495/4340 [00:35<00:07, 108.94it/s]Loading dataset:  81%|████████  | 3506/4340 [00:35<00:07, 109.05it/s]Loading dataset:  81%|████████  | 3517/4340 [00:35<00:07, 109.13it/s]Loading dataset:  81%|████████▏ | 3528/4340 [00:35<00:07, 109.26it/s]Loading dataset:  82%|████████▏ | 3539/4340 [00:35<00:07, 109.44it/s]Loading dataset:  82%|████████▏ | 3550/4340 [00:35<00:07, 109.36it/s]Loading dataset:  82%|████████▏ | 3561/4340 [00:35<00:07, 109.21it/s]Loading dataset:  82%|████████▏ | 3572/4340 [00:37<00:42, 18.04it/s] Loading dataset:  83%|████████▎ | 3583/4340 [00:37<00:31, 23.96it/s]Loading dataset:  83%|████████▎ | 3594/4340 [00:37<00:24, 31.08it/s]Loading dataset:  83%|████████▎ | 3605/4340 [00:37<00:18, 39.31it/s]Loading dataset:  83%|████████▎ | 3616/4340 [00:37<00:15, 48.26it/s]Loading dataset:  84%|████████▎ | 3626/4340 [00:38<00:12, 56.29it/s]Loading dataset:  84%|████████▍ | 3636/4340 [00:38<00:14, 47.56it/s]Loading dataset:  84%|████████▍ | 3644/4340 [00:38<00:19, 35.84it/s]Loading dataset:  84%|████████▍ | 3651/4340 [00:38<00:21, 32.59it/s]Loading dataset:  84%|████████▍ | 3660/4340 [00:39<00:17, 39.87it/s]Loading dataset:  85%|████████▍ | 3669/4340 [00:39<00:14, 47.24it/s]Loading dataset:  85%|████████▍ | 3678/4340 [00:39<00:12, 54.24it/s]Loading dataset:  85%|████████▍ | 3687/4340 [00:39<00:10, 61.32it/s]Loading dataset:  85%|████████▌ | 3697/4340 [00:39<00:09, 68.69it/s]Loading dataset:  85%|████████▌ | 3707/4340 [00:39<00:08, 74.60it/s]Loading dataset:  86%|████████▌ | 3717/4340 [00:39<00:07, 79.24it/s]Loading dataset:  86%|████████▌ | 3727/4340 [00:39<00:07, 82.77it/s]Loading dataset:  86%|████████▌ | 3737/4340 [00:39<00:07, 85.27it/s]Loading dataset:  86%|████████▋ | 3747/4340 [00:40<00:06, 87.21it/s]Loading dataset:  87%|████████▋ | 3757/4340 [00:40<00:06, 88.70it/s]Loading dataset:  87%|████████▋ | 3767/4340 [00:40<00:06, 89.43it/s]Loading dataset:  87%|████████▋ | 3777/4340 [00:40<00:06, 90.22it/s]Loading dataset:  87%|████████▋ | 3787/4340 [00:40<00:06, 90.88it/s]Loading dataset:  87%|████████▋ | 3797/4340 [00:40<00:05, 91.24it/s]Loading dataset:  88%|████████▊ | 3807/4340 [00:40<00:05, 90.85it/s]Loading dataset:  88%|████████▊ | 3817/4340 [00:40<00:05, 91.34it/s]Loading dataset:  88%|████████▊ | 3827/4340 [00:40<00:05, 90.32it/s]Loading dataset:  88%|████████▊ | 3837/4340 [00:41<00:05, 90.86it/s]Loading dataset:  89%|████████▊ | 3847/4340 [00:41<00:05, 90.63it/s]Loading dataset:  89%|████████▉ | 3857/4340 [00:41<00:05, 89.74it/s]Loading dataset:  89%|████████▉ | 3867/4340 [00:41<00:05, 90.44it/s]Loading dataset:  89%|████████▉ | 3877/4340 [00:41<00:05, 91.08it/s]Loading dataset:  90%|████████▉ | 3887/4340 [00:41<00:05, 90.22it/s]Loading dataset:  90%|████████▉ | 3897/4340 [00:41<00:04, 90.89it/s]Loading dataset:  90%|█████████ | 3907/4340 [00:41<00:04, 90.41it/s]Loading dataset:  90%|█████████ | 3917/4340 [00:41<00:04, 90.01it/s]Loading dataset:  90%|█████████ | 3927/4340 [00:42<00:04, 90.52it/s]Loading dataset:  91%|█████████ | 3937/4340 [00:42<00:04, 90.34it/s]Loading dataset:  91%|█████████ | 3947/4340 [00:42<00:05, 71.27it/s]Loading dataset:  91%|█████████ | 3955/4340 [00:42<00:06, 61.67it/s]Loading dataset:  91%|█████████▏| 3962/4340 [00:42<00:06, 55.65it/s]Loading dataset:  91%|█████████▏| 3969/4340 [00:42<00:06, 53.10it/s]Loading dataset:  92%|█████████▏| 3975/4340 [00:42<00:07, 51.50it/s]Loading dataset:  92%|█████████▏| 3981/4340 [00:43<00:07, 50.70it/s]Loading dataset:  92%|█████████▏| 3987/4340 [00:43<00:07, 49.84it/s]Loading dataset:  92%|█████████▏| 3993/4340 [00:43<00:07, 49.06it/s]Loading dataset:  92%|█████████▏| 3998/4340 [00:43<00:07, 48.53it/s]Loading dataset:  92%|█████████▏| 4003/4340 [00:43<00:07, 47.83it/s]Loading dataset:  92%|█████████▏| 4008/4340 [00:43<00:06, 47.59it/s]Loading dataset:  92%|█████████▏| 4013/4340 [00:43<00:06, 47.52it/s]Loading dataset:  93%|█████████▎| 4018/4340 [00:43<00:06, 46.95it/s]Loading dataset:  93%|█████████▎| 4023/4340 [00:44<00:06, 46.99it/s]Loading dataset:  93%|█████████▎| 4032/4340 [00:44<00:05, 57.49it/s]Loading dataset:  93%|█████████▎| 4042/4340 [00:44<00:04, 67.52it/s]Loading dataset:  93%|█████████▎| 4052/4340 [00:44<00:03, 74.58it/s]Loading dataset:  94%|█████████▎| 4062/4340 [00:44<00:03, 79.54it/s]Loading dataset:  94%|█████████▍| 4072/4340 [00:44<00:03, 83.14it/s]Loading dataset:  94%|█████████▍| 4082/4340 [00:44<00:03, 85.65it/s]Loading dataset:  94%|█████████▍| 4091/4340 [00:44<00:03, 70.46it/s]Loading dataset:  94%|█████████▍| 4099/4340 [00:45<00:03, 62.09it/s]Loading dataset:  95%|█████████▍| 4106/4340 [00:45<00:04, 57.41it/s]Loading dataset:  95%|█████████▍| 4113/4340 [00:45<00:04, 54.28it/s]Loading dataset:  95%|█████████▍| 4119/4340 [00:45<00:04, 52.29it/s]Loading dataset:  95%|█████████▌| 4125/4340 [00:45<00:04, 50.88it/s]Loading dataset:  95%|█████████▌| 4131/4340 [00:45<00:04, 49.68it/s]Loading dataset:  95%|█████████▌| 4137/4340 [00:45<00:05, 36.42it/s]Loading dataset:  95%|█████████▌| 4142/4340 [00:46<00:05, 34.14it/s]Loading dataset:  96%|█████████▌| 4148/4340 [00:46<00:04, 38.88it/s]Loading dataset:  96%|█████████▌| 4154/4340 [00:46<00:04, 43.05it/s]Loading dataset:  96%|█████████▌| 4161/4340 [00:46<00:03, 49.10it/s]Loading dataset:  96%|█████████▌| 4168/4340 [00:46<00:03, 53.88it/s]Loading dataset:  96%|█████████▌| 4175/4340 [00:46<00:02, 57.22it/s]Loading dataset:  96%|█████████▋| 4183/4340 [00:46<00:02, 61.09it/s]Loading dataset:  97%|█████████▋| 4191/4340 [00:46<00:02, 63.84it/s]Loading dataset:  97%|█████████▋| 4198/4340 [00:47<00:02, 65.17it/s]Loading dataset:  97%|█████████▋| 4205/4340 [00:47<00:03, 39.03it/s]Loading dataset:  97%|█████████▋| 4211/4340 [00:47<00:04, 30.97it/s]Loading dataset:  97%|█████████▋| 4216/4340 [00:47<00:04, 27.05it/s]Loading dataset:  97%|█████████▋| 4220/4340 [00:48<00:04, 25.46it/s]Loading dataset:  97%|█████████▋| 4227/4340 [00:48<00:03, 32.50it/s]Loading dataset:  98%|█████████▊| 4234/4340 [00:48<00:02, 39.52it/s]Loading dataset:  98%|█████████▊| 4241/4340 [00:48<00:02, 45.83it/s]Loading dataset:  98%|█████████▊| 4248/4340 [00:48<00:01, 51.41it/s]Loading dataset:  98%|█████████▊| 4255/4340 [00:48<00:01, 55.89it/s]Loading dataset:  98%|█████████▊| 4263/4340 [00:48<00:01, 60.28it/s]Loading dataset:  98%|█████████▊| 4271/4340 [00:48<00:01, 63.03it/s]Loading dataset:  99%|█████████▊| 4278/4340 [00:48<00:00, 64.66it/s]Loading dataset:  99%|█████████▉| 4286/4340 [00:49<00:00, 66.78it/s]Loading dataset:  99%|█████████▉| 4294/4340 [00:49<00:00, 68.37it/s]Loading dataset:  99%|█████████▉| 4303/4340 [00:49<00:00, 72.34it/s]Loading dataset:  99%|█████████▉| 4312/4340 [00:49<00:00, 75.28it/s]Loading dataset: 100%|█████████▉| 4320/4340 [00:49<00:00, 76.29it/s]Loading dataset: 100%|█████████▉| 4329/4340 [00:49<00:00, 78.00it/s]Loading dataset: 100%|█████████▉| 4338/4340 [00:49<00:00, 78.20it/s]Loading dataset: 100%|██████████| 4340/4340 [00:49<00:00, 87.25it/s]
+Loading dataset:   0%|          | 0/537 [00:00<?, ?it/s]Loading dataset:   1%|          | 6/537 [00:00<00:09, 57.45it/s]Loading dataset:   3%|▎         | 14/537 [00:00<00:07, 66.24it/s]Loading dataset:   4%|▍         | 22/537 [00:00<00:07, 69.51it/s]Loading dataset:   6%|▌         | 30/537 [00:00<00:07, 71.16it/s]Loading dataset:   7%|▋         | 38/537 [00:00<00:06, 72.02it/s]Loading dataset:   9%|▉         | 47/537 [00:00<00:06, 75.28it/s]Loading dataset:  10%|█         | 56/537 [00:00<00:06, 77.74it/s]Loading dataset:  12%|█▏        | 64/537 [00:00<00:06, 77.84it/s]Loading dataset:  13%|█▎        | 72/537 [00:00<00:05, 78.23it/s]Loading dataset:  15%|█▍        | 80/537 [00:01<00:05, 77.36it/s]Loading dataset:  16%|█▋        | 88/537 [00:01<00:10, 43.48it/s]Loading dataset:  18%|█▊        | 96/537 [00:01<00:08, 50.29it/s]Loading dataset:  19%|█▉        | 104/537 [00:01<00:07, 56.45it/s]Loading dataset:  21%|██        | 112/537 [00:01<00:06, 61.44it/s]Loading dataset:  22%|██▏       | 120/537 [00:01<00:06, 65.80it/s]Loading dataset:  24%|██▍       | 128/537 [00:01<00:05, 69.25it/s]Loading dataset:  25%|██▌       | 136/537 [00:02<00:05, 71.88it/s]Loading dataset:  27%|██▋       | 144/537 [00:02<00:05, 73.73it/s]Loading dataset:  28%|██▊       | 152/537 [00:02<00:05, 75.12it/s]Loading dataset:  30%|██▉       | 160/537 [00:02<00:04, 76.19it/s]Loading dataset:  31%|███▏      | 168/537 [00:02<00:04, 76.92it/s]Loading dataset:  33%|███▎      | 176/537 [00:02<00:04, 77.40it/s]Loading dataset:  34%|███▍      | 184/537 [00:02<00:04, 77.77it/s]Loading dataset:  36%|███▌      | 192/537 [00:02<00:04, 78.04it/s]Loading dataset:  37%|███▋      | 200/537 [00:02<00:04, 77.73it/s]Loading dataset:  39%|███▊      | 208/537 [00:02<00:04, 77.99it/s]Loading dataset:  40%|████      | 216/537 [00:03<00:04, 78.05it/s]Loading dataset:  42%|████▏     | 224/537 [00:03<00:04, 78.20it/s]Loading dataset:  43%|████▎     | 232/537 [00:03<00:03, 78.26it/s]Loading dataset:  45%|████▍     | 240/537 [00:03<00:03, 78.19it/s]Loading dataset:  46%|████▌     | 248/537 [00:03<00:03, 78.29it/s]Loading dataset:  48%|████▊     | 256/537 [00:03<00:03, 77.81it/s]Loading dataset:  49%|████▉     | 264/537 [00:03<00:03, 78.00it/s]Loading dataset:  51%|█████     | 272/537 [00:03<00:03, 78.20it/s]Loading dataset:  52%|█████▏    | 280/537 [00:03<00:03, 78.23it/s]Loading dataset:  54%|█████▎    | 288/537 [00:04<00:03, 72.81it/s]Loading dataset:  55%|█████▌    | 296/537 [00:04<00:03, 71.23it/s]Loading dataset:  57%|█████▋    | 304/537 [00:04<00:03, 70.26it/s]Loading dataset:  58%|█████▊    | 312/537 [00:04<00:03, 69.62it/s]Loading dataset:  59%|█████▉    | 319/537 [00:04<00:03, 69.20it/s]Loading dataset:  61%|██████    | 327/537 [00:04<00:02, 70.46it/s]Loading dataset:  62%|██████▏   | 335/537 [00:04<00:02, 72.29it/s]Loading dataset:  64%|██████▍   | 343/537 [00:04<00:02, 73.69it/s]Loading dataset:  65%|██████▌   | 351/537 [00:04<00:02, 74.66it/s]Loading dataset:  67%|██████▋   | 359/537 [00:04<00:02, 75.40it/s]Loading dataset:  68%|██████▊   | 367/537 [00:05<00:02, 75.78it/s]Loading dataset:  70%|██████▉   | 375/537 [00:05<00:02, 75.85it/s]Loading dataset:  71%|███████▏  | 383/537 [00:05<00:02, 75.93it/s]Loading dataset:  73%|███████▎  | 391/537 [00:05<00:01, 76.73it/s]Loading dataset:  74%|███████▍  | 399/537 [00:05<00:01, 76.69it/s]Loading dataset:  76%|███████▌  | 407/537 [00:05<00:01, 76.43it/s]Loading dataset:  77%|███████▋  | 415/537 [00:05<00:01, 76.85it/s]Loading dataset:  79%|███████▉  | 423/537 [00:05<00:01, 76.54it/s]Loading dataset:  80%|████████  | 431/537 [00:05<00:01, 76.42it/s]Loading dataset:  82%|████████▏ | 439/537 [00:06<00:01, 76.44it/s]Loading dataset:  83%|████████▎ | 447/537 [00:06<00:01, 76.17it/s]Loading dataset:  85%|████████▍ | 455/537 [00:06<00:01, 76.28it/s]Loading dataset:  86%|████████▌ | 463/537 [00:06<00:00, 76.38it/s]Loading dataset:  88%|████████▊ | 471/537 [00:06<00:00, 76.02it/s]Loading dataset:  89%|████████▉ | 479/537 [00:06<00:00, 76.56it/s]Loading dataset:  91%|█████████ | 487/537 [00:06<00:00, 76.79it/s]Loading dataset:  92%|█████████▏| 495/537 [00:06<00:00, 76.60it/s]Loading dataset:  94%|█████████▎| 503/537 [00:06<00:00, 76.99it/s]Loading dataset:  95%|█████████▌| 511/537 [00:06<00:00, 77.56it/s]Loading dataset:  97%|█████████▋| 519/537 [00:07<00:00, 77.06it/s]Loading dataset:  98%|█████████▊| 527/537 [00:07<00:00, 77.19it/s]Loading dataset: 100%|█████████▉| 535/537 [00:07<00:00, 77.22it/s]Loading dataset: 100%|██████████| 537/537 [00:07<00:00, 73.39it/s]
+Training Steps: Samples(6201)/Batch Size(8) 775
+Validation Steps: Samples({num_samples_val})/Batch Size({batch_size}) 96
+Length of the DataLoader 776
+Length of the DataLoader 96
+ Trainable Parameters: 7750087
+cuda
+1/200 epoch 1, training loss: 0.0000, validation metric: 0.0000, validation loss: 0.0000 [                              ]
+epoch 1 average loss: 0.5103
+Validation loss decreased (inf --> 0.395570).  Saving model ...
+2/200 epoch 2, training loss: 0.5103, validation metric: 0.6597, validation loss: 0.3956 [                              ]
+epoch 2 average loss: 0.3705
+Validation loss decreased (0.395570 --> 0.376019).  Saving model ...
+3/200 epoch 3, training loss: 0.3705, validation metric: 0.6800, validation loss: 0.3760 [                              ]
+epoch 3 average loss: 0.3546
+Validation loss decreased (0.376019 --> 0.364634).  Saving model ...
+4/200 epoch 4, training loss: 0.3546, validation metric: 0.6923, validation loss: 0.3646 [                              ]
+epoch 4 average loss: 0.3458
+Validation loss decreased (0.364634 --> 0.358911).  Saving model ...
+5/200 epoch 5, training loss: 0.3458, validation metric: 0.6988, validation loss: 0.3589 [                              ]
+epoch 5 average loss: 0.3400
+Validation loss decreased (0.358911 --> 0.354609).  Saving model ...
+6/200 epoch 6, training loss: 0.3400, validation metric: 0.7034, validation loss: 0.3546 [                              ]
+epoch 6 average loss: 0.3350
+Validation loss decreased (0.354609 --> 0.346876).  Saving model ...
+7/200 epoch 7, training loss: 0.3350, validation metric: 0.7112, validation loss: 0.3469 [=                             ]
+epoch 7 average loss: 0.3285
+Validation loss decreased (0.346876 --> 0.345775).  Saving model ...
+8/200 epoch 8, training loss: 0.3285, validation metric: 0.7129, validation loss: 0.3458 [=                             ]
+epoch 8 average loss: 0.3239
+EarlyStopping counter: 1 out of 50
+9/200 epoch 9, training loss: 0.3239, validation metric: 0.6952, validation loss: 0.3623 [=                             ]
+epoch 9 average loss: 0.3189
+Validation loss decreased (0.345775 --> 0.340312).  Saving model ...
+10/200 epoch 10, training loss: 0.3189, validation metric: 0.7180, validation loss: 0.3403 [=                             ]
+epoch 10 average loss: 0.3153
+Validation loss decreased (0.340312 --> 0.335265).  Saving model ...
+11/200 epoch 11, training loss: 0.3153, validation metric: 0.7230, validation loss: 0.3353 [=                             ]
+epoch 11 average loss: 0.2926
+EarlyStopping counter: 1 out of 50
+12/200 epoch 12, training loss: 0.2926, validation metric: 0.5018, validation loss: 0.4639 [=                             ]
+epoch 12 average loss: 0.2848
+Validation loss decreased (0.335265 --> 0.297028).  Saving model ...
+13/200 epoch 13, training loss: 0.2848, validation metric: 0.7058, validation loss: 0.2970 [=                             ]
+epoch 13 average loss: 0.2712
+Validation loss decreased (0.297028 --> 0.273135).  Saving model ...
+14/200 epoch 14, training loss: 0.2712, validation metric: 0.7129, validation loss: 0.2731 [==                            ]
+epoch 14 average loss: 0.2572
+EarlyStopping counter: 1 out of 50
+15/200 epoch 15, training loss: 0.2572, validation metric: 0.6926, validation loss: 0.2931 [==                            ]
+epoch 15 average loss: 0.2693
+EarlyStopping counter: 2 out of 50
+16/200 epoch 16, training loss: 0.2693, validation metric: 0.6996, validation loss: 0.2899 [==                            ]
+epoch 16 average loss: 0.2790
+EarlyStopping counter: 3 out of 50
+17/200 epoch 17, training loss: 0.2790, validation metric: 0.7045, validation loss: 0.2746 [==                            ]
+epoch 17 average loss: 0.2532
+EarlyStopping counter: 4 out of 50
+18/200 epoch 18, training loss: 0.2532, validation metric: 0.7094, validation loss: 0.2736 [==                            ]
+epoch 18 average loss: 0.2518
+Validation loss decreased (0.273135 --> 0.269938).  Saving model ...
+19/200 epoch 19, training loss: 0.2518, validation metric: 0.7126, validation loss: 0.2699 [==                            ]
+epoch 19 average loss: 0.2771
+EarlyStopping counter: 1 out of 50
+20/200 epoch 20, training loss: 0.2771, validation metric: 0.7112, validation loss: 0.2739 [===                           ]
+epoch 20 average loss: 0.2525
+EarlyStopping counter: 2 out of 50
+21/200 epoch 21, training loss: 0.2525, validation metric: 0.7170, validation loss: 0.2721 [===                           ]
+epoch 21 average loss: 0.2607
+Validation loss decreased (0.269938 --> 0.268957).  Saving model ...
+22/200 epoch 22, training loss: 0.2607, validation metric: 0.7106, validation loss: 0.2690 [===                           ]
+epoch 22 average loss: 0.2587
+Validation loss decreased (0.268957 --> 0.266191).  Saving model ...
+23/200 epoch 23, training loss: 0.2587, validation metric: 0.7136, validation loss: 0.2662 [===                           ]
+epoch 23 average loss: 0.2495
+EarlyStopping counter: 1 out of 50
+24/200 epoch 24, training loss: 0.2495, validation metric: 0.7094, validation loss: 0.2713 [===                           ]
+epoch 24 average loss: 0.2523
+EarlyStopping counter: 2 out of 50
+25/200 epoch 25, training loss: 0.2523, validation metric: 0.7031, validation loss: 0.2787 [===                           ]
+epoch 25 average loss: 0.2510
+Validation loss decreased (0.266191 --> 0.260003).  Saving model ...
+26/200 epoch 26, training loss: 0.2510, validation metric: 0.7217, validation loss: 0.2600 [===                           ]
+epoch 26 average loss: 0.2439
+EarlyStopping counter: 1 out of 50
+27/200 epoch 27, training loss: 0.2439, validation metric: 0.7103, validation loss: 0.2714 [====                          ]
+epoch 27 average loss: 0.2527
+EarlyStopping counter: 2 out of 50
+28/200 epoch 28, training loss: 0.2527, validation metric: 0.7132, validation loss: 0.2744 [====                          ]
+epoch 28 average loss: 0.2442
+Validation loss decreased (0.260003 --> 0.258563).  Saving model ...
+29/200 epoch 29, training loss: 0.2442, validation metric: 0.7232, validation loss: 0.2586 [====                          ]
+epoch 29 average loss: 0.2426
+EarlyStopping counter: 1 out of 50
+30/200 epoch 30, training loss: 0.2426, validation metric: 0.7132, validation loss: 0.2676 [====                          ]
+epoch 30 average loss: 0.2390
+EarlyStopping counter: 2 out of 50
+31/200 epoch 31, training loss: 0.2390, validation metric: 0.7229, validation loss: 0.2587 [====                          ]
+epoch 31 average loss: 0.2392
+EarlyStopping counter: 3 out of 50
+32/200 epoch 32, training loss: 0.2392, validation metric: 0.7197, validation loss: 0.2657 [====                          ]
+epoch 32 average loss: 0.2572
+EarlyStopping counter: 4 out of 50
+33/200 epoch 33, training loss: 0.2572, validation metric: 0.7108, validation loss: 0.2787 [====                          ]
+epoch 33 average loss: 0.2621
+EarlyStopping counter: 5 out of 50
+34/200 epoch 34, training loss: 0.2621, validation metric: 0.5797, validation loss: 0.3906 [=====                         ]
+epoch 34 average loss: 0.2660
+EarlyStopping counter: 6 out of 50
+35/200 epoch 35, training loss: 0.2660, validation metric: 0.7111, validation loss: 0.2728 [=====                         ]
+epoch 35 average loss: 0.2439
+EarlyStopping counter: 7 out of 50
+36/200 epoch 36, training loss: 0.2439, validation metric: 0.7113, validation loss: 0.2683 [=====                         ]
+epoch 36 average loss: 0.2476
+EarlyStopping counter: 8 out of 50
+37/200 epoch 37, training loss: 0.2476, validation metric: 0.7111, validation loss: 0.2684 [=====                         ]
+epoch 37 average loss: 0.2530
+EarlyStopping counter: 9 out of 50
+38/200 epoch 38, training loss: 0.2530, validation metric: 0.6979, validation loss: 0.2807 [=====                         ]
+epoch 38 average loss: 0.2500
+Validation loss decreased (0.258563 --> 0.258010).  Saving model ...
+39/200 epoch 39, training loss: 0.2500, validation metric: 0.7224, validation loss: 0.2580 [=====                         ]
+epoch 39 average loss: 0.2376
+EarlyStopping counter: 1 out of 50
+40/200 epoch 40, training loss: 0.2376, validation metric: 0.6825, validation loss: 0.3103 [======                        ]
+epoch 40 average loss: 0.2490
+EarlyStopping counter: 2 out of 50
+41/200 epoch 41, training loss: 0.2490, validation metric: 0.7179, validation loss: 0.2635 [======                        ]
+epoch 41 average loss: 0.2382
+EarlyStopping counter: 3 out of 50
+42/200 epoch 42, training loss: 0.2382, validation metric: 0.7218, validation loss: 0.2598 [======                        ]
+epoch 42 average loss: 0.2684
+EarlyStopping counter: 4 out of 50
+43/200 epoch 43, training loss: 0.2684, validation metric: 0.7174, validation loss: 0.2640 [======                        ]
+epoch 43 average loss: 0.2458
+EarlyStopping counter: 5 out of 50
+44/200 epoch 44, training loss: 0.2458, validation metric: 0.7150, validation loss: 0.2660 [======                        ]
+epoch 44 average loss: 0.2384
+EarlyStopping counter: 6 out of 50
+45/200 epoch 45, training loss: 0.2384, validation metric: 0.7141, validation loss: 0.2681 [======                        ]
+epoch 45 average loss: 0.2370
+EarlyStopping counter: 7 out of 50
+46/200 epoch 46, training loss: 0.2370, validation metric: 0.7156, validation loss: 0.2669 [======                        ]
+epoch 46 average loss: 0.2503
+Validation loss decreased (0.258010 --> 0.257508).  Saving model ...
+47/200 epoch 47, training loss: 0.2503, validation metric: 0.7228, validation loss: 0.2575 [=======                       ]
+epoch 47 average loss: 0.2458
+EarlyStopping counter: 1 out of 50
+48/200 epoch 48, training loss: 0.2458, validation metric: 0.7133, validation loss: 0.2663 [=======                       ]
+epoch 48 average loss: 0.2387
+EarlyStopping counter: 2 out of 50
+49/200 epoch 49, training loss: 0.2387, validation metric: 0.7201, validation loss: 0.2613 [=======                       ]
+epoch 49 average loss: 0.2424
+EarlyStopping counter: 3 out of 50
+50/200 epoch 50, training loss: 0.2424, validation metric: 0.7153, validation loss: 0.2645 [=======                       ]
+epoch 50 average loss: 0.2620
+EarlyStopping counter: 4 out of 50
+51/200 epoch 51, training loss: 0.2620, validation metric: 0.7095, validation loss: 0.2698 [=======                       ]
+epoch 51 average loss: 0.2433
+EarlyStopping counter: 5 out of 50
+52/200 epoch 52, training loss: 0.2433, validation metric: 0.7168, validation loss: 0.2631 [=======                       ]
+epoch 52 average loss: 0.2372
+EarlyStopping counter: 6 out of 50
+53/200 epoch 53, training loss: 0.2372, validation metric: 0.7201, validation loss: 0.2601 [=======                       ]
+epoch 53 average loss: 0.2326
+Validation loss decreased (0.257508 --> 0.256600).  Saving model ...
+54/200 epoch 54, training loss: 0.2326, validation metric: 0.7267, validation loss: 0.2566 [========                      ]
+epoch 54 average loss: 0.2556
+EarlyStopping counter: 1 out of 50
+55/200 epoch 55, training loss: 0.2556, validation metric: 0.6930, validation loss: 0.2850 [========                      ]
+epoch 55 average loss: 0.2458
+EarlyStopping counter: 2 out of 50
+56/200 epoch 56, training loss: 0.2458, validation metric: 0.7191, validation loss: 0.2623 [========                      ]
+epoch 56 average loss: 0.2382
+EarlyStopping counter: 3 out of 50
+57/200 epoch 57, training loss: 0.2382, validation metric: 0.7089, validation loss: 0.2716 [========                      ]
+epoch 57 average loss: 0.2318
+Validation loss decreased (0.256600 --> 0.256285).  Saving model ...
+58/200 epoch 58, training loss: 0.2318, validation metric: 0.7256, validation loss: 0.2563 [========                      ]
+epoch 58 average loss: 0.2340
+EarlyStopping counter: 1 out of 50
+59/200 epoch 59, training loss: 0.2340, validation metric: 0.7035, validation loss: 0.2754 [========                      ]
+epoch 59 average loss: 0.2467
+EarlyStopping counter: 2 out of 50
+60/200 epoch 60, training loss: 0.2467, validation metric: 0.7133, validation loss: 0.2694 [=========                     ]
+epoch 60 average loss: 0.2371
+EarlyStopping counter: 3 out of 50
+61/200 epoch 61, training loss: 0.2371, validation metric: 0.7135, validation loss: 0.2687 [=========                     ]
+epoch 61 average loss: 0.2360
+EarlyStopping counter: 4 out of 50
+62/200 epoch 62, training loss: 0.2360, validation metric: 0.6940, validation loss: 0.2840 [=========                     ]
+epoch 62 average loss: 0.2405
+EarlyStopping counter: 5 out of 50
+63/200 epoch 63, training loss: 0.2405, validation metric: 0.7132, validation loss: 0.2690 [=========                     ]
+epoch 63 average loss: 0.2337
+EarlyStopping counter: 6 out of 50
+64/200 epoch 64, training loss: 0.2337, validation metric: 0.7151, validation loss: 0.2646 [=========                     ]
+epoch 64 average loss: 0.2312
+EarlyStopping counter: 7 out of 50
+65/200 epoch 65, training loss: 0.2312, validation metric: 0.7149, validation loss: 0.2649 [=========                     ]
+epoch 65 average loss: 0.2379
+EarlyStopping counter: 8 out of 50
+66/200 epoch 66, training loss: 0.2379, validation metric: 0.7193, validation loss: 0.2608 [=========                     ]
+epoch 66 average loss: 0.2391
+EarlyStopping counter: 9 out of 50
+67/200 epoch 67, training loss: 0.2391, validation metric: 0.7155, validation loss: 0.2656 [==========                    ]
+epoch 67 average loss: 0.2419
+EarlyStopping counter: 10 out of 50
+68/200 epoch 68, training loss: 0.2419, validation metric: 0.7160, validation loss: 0.2651 [==========                    ]
+epoch 68 average loss: 0.2312
+EarlyStopping counter: 11 out of 50
+69/200 epoch 69, training loss: 0.2312, validation metric: 0.7233, validation loss: 0.2583 [==========                    ]
+epoch 69 average loss: 0.2295
+EarlyStopping counter: 12 out of 50
+70/200 epoch 70, training loss: 0.2295, validation metric: 0.6957, validation loss: 0.2825 [==========                    ]
+epoch 70 average loss: 0.2388
+EarlyStopping counter: 13 out of 50
+71/200 epoch 71, training loss: 0.2388, validation metric: 0.7213, validation loss: 0.2602 [==========                    ]
+epoch 71 average loss: 0.2321
+Validation loss decreased (0.256285 --> 0.254651).  Saving model ...
+72/200 epoch 72, training loss: 0.2321, validation metric: 0.7274, validation loss: 0.2547 [==========                    ]
+epoch 72 average loss: 0.2324
+Validation loss decreased (0.254651 --> 0.254551).  Saving model ...
+73/200 epoch 73, training loss: 0.2324, validation metric: 0.7275, validation loss: 0.2546 [==========                    ]
+epoch 73 average loss: 0.2257
+EarlyStopping counter: 1 out of 50
+74/200 epoch 74, training loss: 0.2257, validation metric: 0.7262, validation loss: 0.2570 [===========                   ]
+epoch 74 average loss: 0.2298
+EarlyStopping counter: 2 out of 50
+75/200 epoch 75, training loss: 0.2298, validation metric: 0.7203, validation loss: 0.2611 [===========                   ]
+epoch 75 average loss: 0.2225
+EarlyStopping counter: 3 out of 50
+76/200 epoch 76, training loss: 0.2225, validation metric: 0.7204, validation loss: 0.2623 [===========                   ]
+epoch 76 average loss: 0.2230
+Validation loss decreased (0.254551 --> 0.249630).  Saving model ...
+77/200 epoch 77, training loss: 0.2230, validation metric: 0.7328, validation loss: 0.2496 [===========                   ]
+epoch 77 average loss: 0.2260
+EarlyStopping counter: 1 out of 50
+78/200 epoch 78, training loss: 0.2260, validation metric: 0.7012, validation loss: 0.2800 [===========                   ]
+epoch 78 average loss: 0.2284
+EarlyStopping counter: 2 out of 50
+79/200 epoch 79, training loss: 0.2284, validation metric: 0.7230, validation loss: 0.2574 [===========                   ]
+epoch 79 average loss: 0.2288
+EarlyStopping counter: 3 out of 50
+80/200 epoch 80, training loss: 0.2288, validation metric: 0.7301, validation loss: 0.2521 [============                  ]
+epoch 80 average loss: 0.2206
+EarlyStopping counter: 4 out of 50
+81/200 epoch 81, training loss: 0.2206, validation metric: 0.7301, validation loss: 0.2521 [============                  ]
+epoch 81 average loss: 0.2241
+EarlyStopping counter: 5 out of 50
+82/200 epoch 82, training loss: 0.2241, validation metric: 0.7191, validation loss: 0.2635 [============                  ]
+epoch 82 average loss: 0.2174
+EarlyStopping counter: 6 out of 50
+83/200 epoch 83, training loss: 0.2174, validation metric: 0.7295, validation loss: 0.2540 [============                  ]
+epoch 83 average loss: 0.2238
+EarlyStopping counter: 7 out of 50
+84/200 epoch 84, training loss: 0.2238, validation metric: 0.7220, validation loss: 0.2609 [============                  ]
+epoch 84 average loss: 0.2219
+EarlyStopping counter: 8 out of 50
+85/200 epoch 85, training loss: 0.2219, validation metric: 0.7201, validation loss: 0.2613 [============                  ]
+epoch 85 average loss: 0.2369
+EarlyStopping counter: 9 out of 50
+86/200 epoch 86, training loss: 0.2369, validation metric: 0.7252, validation loss: 0.2566 [============                  ]
+epoch 86 average loss: 0.2206
+EarlyStopping counter: 10 out of 50
+87/200 epoch 87, training loss: 0.2206, validation metric: 0.7256, validation loss: 0.2562 [=============                 ]
+epoch 87 average loss: 0.2162
+EarlyStopping counter: 11 out of 50
+88/200 epoch 88, training loss: 0.2162, validation metric: 0.7295, validation loss: 0.2526 [=============                 ]
+epoch 88 average loss: 0.2261
+EarlyStopping counter: 12 out of 50
+89/200 epoch 89, training loss: 0.2261, validation metric: 0.7304, validation loss: 0.2505 [=============                 ]
+epoch 89 average loss: 0.2198
+EarlyStopping counter: 13 out of 50
+90/200 epoch 90, training loss: 0.2198, validation metric: 0.7256, validation loss: 0.2562 [=============                 ]
+epoch 90 average loss: 0.2303
+EarlyStopping counter: 14 out of 50
+91/200 epoch 91, training loss: 0.2303, validation metric: 0.7326, validation loss: 0.2511 [=============                 ]
+epoch 91 average loss: 0.2194
+EarlyStopping counter: 15 out of 50
+92/200 epoch 92, training loss: 0.2194, validation metric: 0.7271, validation loss: 0.2562 [=============                 ]
+epoch 92 average loss: 0.2189
+EarlyStopping counter: 16 out of 50
+93/200 epoch 93, training loss: 0.2189, validation metric: 0.7272, validation loss: 0.2587 [=============                 ]
+epoch 93 average loss: 0.2250
+EarlyStopping counter: 17 out of 50
+94/200 epoch 94, training loss: 0.2250, validation metric: 0.7163, validation loss: 0.2661 [==============                ]
+epoch 94 average loss: 0.2189
+EarlyStopping counter: 18 out of 50
+95/200 epoch 95, training loss: 0.2189, validation metric: 0.7294, validation loss: 0.2528 [==============                ]
+epoch 95 average loss: 0.2165
+EarlyStopping counter: 19 out of 50
+96/200 epoch 96, training loss: 0.2165, validation metric: 0.7333, validation loss: 0.2517 [==============                ]
+epoch 96 average loss: 0.2358
+EarlyStopping counter: 20 out of 50
+97/200 epoch 97, training loss: 0.2358, validation metric: 0.7263, validation loss: 0.2582 [==============                ]
+epoch 97 average loss: 0.2205
+EarlyStopping counter: 21 out of 50
+98/200 epoch 98, training loss: 0.2205, validation metric: 0.7287, validation loss: 0.2560 [==============                ]
+epoch 98 average loss: 0.2156
+Validation loss decreased (0.249630 --> 0.246728).  Saving model ...
+99/200 epoch 99, training loss: 0.2156, validation metric: 0.7360, validation loss: 0.2467 [==============                ]
+epoch 99 average loss: 0.2160
+EarlyStopping counter: 1 out of 50
+100/200 epoch 100, training loss: 0.2160, validation metric: 0.7296, validation loss: 0.2551 [===============               ]
+epoch 100 average loss: 0.2188
+EarlyStopping counter: 2 out of 50
+101/200 epoch 101, training loss: 0.2188, validation metric: 0.7097, validation loss: 0.2748 [===============               ]
+epoch 101 average loss: 0.2193
+EarlyStopping counter: 3 out of 50
+102/200 epoch 102, training loss: 0.2193, validation metric: 0.7292, validation loss: 0.2543 [===============               ]
+epoch 102 average loss: 0.2185
+EarlyStopping counter: 4 out of 50
+103/200 epoch 103, training loss: 0.2185, validation metric: 0.7234, validation loss: 0.2595 [===============               ]
+epoch 103 average loss: 0.2144
+Validation loss decreased (0.246728 --> 0.246627).  Saving model ...
+104/200 epoch 104, training loss: 0.2144, validation metric: 0.7360, validation loss: 0.2466 [===============               ]
+epoch 104 average loss: 0.2197
+EarlyStopping counter: 1 out of 50
+105/200 epoch 105, training loss: 0.2197, validation metric: 0.7270, validation loss: 0.2549 [===============               ]
+epoch 105 average loss: 0.2145
+EarlyStopping counter: 2 out of 50
+106/200 epoch 106, training loss: 0.2145, validation metric: 0.7217, validation loss: 0.2612 [===============               ]
+epoch 106 average loss: 0.2170
+EarlyStopping counter: 3 out of 50
+107/200 epoch 107, training loss: 0.2170, validation metric: 0.7230, validation loss: 0.2612 [================              ]
+epoch 107 average loss: 0.2172
+EarlyStopping counter: 4 out of 50
+108/200 epoch 108, training loss: 0.2172, validation metric: 0.7299, validation loss: 0.2536 [================              ]
+epoch 108 average loss: 0.2145
+EarlyStopping counter: 5 out of 50
+109/200 epoch 109, training loss: 0.2145, validation metric: 0.7179, validation loss: 0.2634 [================              ]
+epoch 109 average loss: 0.2156
+EarlyStopping counter: 6 out of 50
+110/200 epoch 110, training loss: 0.2156, validation metric: 0.7272, validation loss: 0.2560 [================              ]
+epoch 110 average loss: 0.2212
+EarlyStopping counter: 7 out of 50
+111/200 epoch 111, training loss: 0.2212, validation metric: 0.7239, validation loss: 0.2592 [================              ]
+epoch 111 average loss: 0.2313
+EarlyStopping counter: 8 out of 50
+112/200 epoch 112, training loss: 0.2313, validation metric: 0.7250, validation loss: 0.2555 [================              ]
+epoch 112 average loss: 0.2161
+EarlyStopping counter: 9 out of 50
+113/200 epoch 113, training loss: 0.2161, validation metric: 0.7286, validation loss: 0.2522 [================              ]
+epoch 113 average loss: 0.2175
+EarlyStopping counter: 10 out of 50
+114/200 epoch 114, training loss: 0.2175, validation metric: 0.6936, validation loss: 0.2857 [=================             ]
+epoch 114 average loss: 0.2176
+EarlyStopping counter: 11 out of 50
+115/200 epoch 115, training loss: 0.2176, validation metric: 0.7313, validation loss: 0.2511 [=================             ]
+epoch 115 average loss: 0.2217
+EarlyStopping counter: 12 out of 50
+116/200 epoch 116, training loss: 0.2217, validation metric: 0.7295, validation loss: 0.2514 [=================             ]
+epoch 116 average loss: 0.2144
+EarlyStopping counter: 13 out of 50
+117/200 epoch 117, training loss: 0.2144, validation metric: 0.7295, validation loss: 0.2513 [=================             ]
+epoch 117 average loss: 0.2112
+EarlyStopping counter: 14 out of 50
+118/200 epoch 118, training loss: 0.2112, validation metric: 0.7262, validation loss: 0.2570 [=================             ]
+epoch 118 average loss: 0.2117
+EarlyStopping counter: 15 out of 50
+119/200 epoch 119, training loss: 0.2117, validation metric: 0.7188, validation loss: 0.2639 [=================             ]
+epoch 119 average loss: 0.2238
+EarlyStopping counter: 16 out of 50
+120/200 epoch 120, training loss: 0.2238, validation metric: 0.7237, validation loss: 0.2593 [==================            ]
+epoch 120 average loss: 0.2200
+EarlyStopping counter: 17 out of 50
+121/200 epoch 121, training loss: 0.2200, validation metric: 0.7064, validation loss: 0.2766 [==================            ]
+epoch 121 average loss: 0.2227
+EarlyStopping counter: 18 out of 50
+122/200 epoch 122, training loss: 0.2227, validation metric: 0.7227, validation loss: 0.2589 [==================            ]
+epoch 122 average loss: 0.2308
+EarlyStopping counter: 19 out of 50
+123/200 epoch 123, training loss: 0.2308, validation metric: 0.7217, validation loss: 0.2598 [==================            ]
+epoch 123 average loss: 0.2158
+EarlyStopping counter: 20 out of 50
+124/200 epoch 124, training loss: 0.2158, validation metric: 0.7313, validation loss: 0.2510 [==================            ]
+epoch 124 average loss: 0.2107
+EarlyStopping counter: 21 out of 50
+125/200 epoch 125, training loss: 0.2107, validation metric: 0.7342, validation loss: 0.2496 [==================            ]
+epoch 125 average loss: 0.2117
+EarlyStopping counter: 22 out of 50
+126/200 epoch 126, training loss: 0.2117, validation metric: 0.7321, validation loss: 0.2503 [==================            ]
+epoch 126 average loss: 0.2207
+EarlyStopping counter: 23 out of 50
+127/200 epoch 127, training loss: 0.2207, validation metric: 0.7243, validation loss: 0.2575 [===================           ]
+epoch 127 average loss: 0.2217
+EarlyStopping counter: 24 out of 50
+128/200 epoch 128, training loss: 0.2217, validation metric: 0.7288, validation loss: 0.2532 [===================           ]
+epoch 128 average loss: 0.2120
+EarlyStopping counter: 25 out of 50
+129/200 epoch 129, training loss: 0.2120, validation metric: 0.7280, validation loss: 0.2540 [===================           ]
+epoch 129 average loss: 0.2098
+EarlyStopping counter: 26 out of 50
+130/200 epoch 130, training loss: 0.2098, validation metric: 0.7304, validation loss: 0.2531 [===================           ]
+epoch 130 average loss: 0.2083
+EarlyStopping counter: 27 out of 50
+131/200 epoch 131, training loss: 0.2083, validation metric: 0.7356, validation loss: 0.2470 [===================           ]
+epoch 131 average loss: 0.2082
+EarlyStopping counter: 28 out of 50
+132/200 epoch 132, training loss: 0.2082, validation metric: 0.7321, validation loss: 0.2503 [===================           ]
+epoch 132 average loss: 0.2150
+EarlyStopping counter: 29 out of 50
+133/200 epoch 133, training loss: 0.2150, validation metric: 0.6656, validation loss: 0.3101 [===================           ]
+epoch 133 average loss: 0.2241
+EarlyStopping counter: 30 out of 50
+134/200 epoch 134, training loss: 0.2241, validation metric: 0.7240, validation loss: 0.2590 [====================          ]
+epoch 134 average loss: 0.2201
+EarlyStopping counter: 31 out of 50
+135/200 epoch 135, training loss: 0.2201, validation metric: 0.7278, validation loss: 0.2542 [====================          ]
+epoch 135 average loss: 0.2129
+EarlyStopping counter: 32 out of 50
+136/200 epoch 136, training loss: 0.2129, validation metric: 0.6993, validation loss: 0.2791 [====================          ]
+epoch 136 average loss: 0.2319
+EarlyStopping counter: 33 out of 50
+137/200 epoch 137, training loss: 0.2319, validation metric: 0.7245, validation loss: 0.2559 [====================          ]
+epoch 137 average loss: 0.2288
+EarlyStopping counter: 34 out of 50
+138/200 epoch 138, training loss: 0.2288, validation metric: 0.7232, validation loss: 0.2572 [====================          ]
+epoch 138 average loss: 0.2151
+EarlyStopping counter: 35 out of 50
+139/200 epoch 139, training loss: 0.2151, validation metric: 0.7344, validation loss: 0.2482 [====================          ]
+epoch 139 average loss: 0.2095
+Validation loss decreased (0.246627 --> 0.245203).  Saving model ...
+140/200 epoch 140, training loss: 0.2095, validation metric: 0.7376, validation loss: 0.2452 [=====================         ]
+epoch 140 average loss: 0.2105
+EarlyStopping counter: 1 out of 50
+141/200 epoch 141, training loss: 0.2105, validation metric: 0.7306, validation loss: 0.2516 [=====================         ]
+epoch 141 average loss: 0.2195
+EarlyStopping counter: 2 out of 50
+142/200 epoch 142, training loss: 0.2195, validation metric: 0.7267, validation loss: 0.2552 [=====================         ]
+epoch 142 average loss: 0.2170
+EarlyStopping counter: 3 out of 50
+143/200 epoch 143, training loss: 0.2170, validation metric: 0.7305, validation loss: 0.2517 [=====================         ]
+epoch 143 average loss: 0.2102
+EarlyStopping counter: 4 out of 50
+144/200 epoch 144, training loss: 0.2102, validation metric: 0.7335, validation loss: 0.2489 [=====================         ]
+epoch 144 average loss: 0.2083
+EarlyStopping counter: 5 out of 50
+145/200 epoch 145, training loss: 0.2083, validation metric: 0.7292, validation loss: 0.2529 [=====================         ]
+epoch 145 average loss: 0.2078
+EarlyStopping counter: 6 out of 50
+146/200 epoch 146, training loss: 0.2078, validation metric: 0.7298, validation loss: 0.2523 [=====================         ]
+epoch 146 average loss: 0.2066
+EarlyStopping counter: 7 out of 50
+147/200 epoch 147, training loss: 0.2066, validation metric: 0.7334, validation loss: 0.2517 [======================        ]
+epoch 147 average loss: 0.2154
+EarlyStopping counter: 8 out of 50
+148/200 epoch 148, training loss: 0.2154, validation metric: 0.7320, validation loss: 0.2503 [======================        ]
+epoch 148 average loss: 0.2113
+EarlyStopping counter: 9 out of 50
+149/200 epoch 149, training loss: 0.2113, validation metric: 0.7298, validation loss: 0.2537 [======================        ]
+epoch 149 average loss: 0.2115
+EarlyStopping counter: 10 out of 50
+150/200 epoch 150, training loss: 0.2115, validation metric: 0.7345, validation loss: 0.2467 [======================        ]
+epoch 150 average loss: 0.2104
+EarlyStopping counter: 11 out of 50
+151/200 epoch 151, training loss: 0.2104, validation metric: 0.7340, validation loss: 0.2485 [======================        ]
+epoch 151 average loss: 0.2063
+EarlyStopping counter: 12 out of 50
+152/200 epoch 152, training loss: 0.2063, validation metric: 0.7356, validation loss: 0.2483 [======================        ]
+epoch 152 average loss: 0.2080
+EarlyStopping counter: 13 out of 50
+153/200 epoch 153, training loss: 0.2080, validation metric: 0.7337, validation loss: 0.2474 [======================        ]
+epoch 153 average loss: 0.2113
+EarlyStopping counter: 14 out of 50
+154/200 epoch 154, training loss: 0.2113, validation metric: 0.7329, validation loss: 0.2496 [=======================       ]
+epoch 154 average loss: 0.2080
+EarlyStopping counter: 15 out of 50
+155/200 epoch 155, training loss: 0.2080, validation metric: 0.7375, validation loss: 0.2453 [=======================       ]
+epoch 155 average loss: 0.2114
+EarlyStopping counter: 16 out of 50
+156/200 epoch 156, training loss: 0.2114, validation metric: 0.7345, validation loss: 0.2493 [=======================       ]
+epoch 156 average loss: 0.2078
+EarlyStopping counter: 17 out of 50
+157/200 epoch 157, training loss: 0.2078, validation metric: 0.7242, validation loss: 0.2588 [=======================       ]
+epoch 157 average loss: 0.2046
+EarlyStopping counter: 18 out of 50
+158/200 epoch 158, training loss: 0.2046, validation metric: 0.7262, validation loss: 0.2556 [=======================       ]
+epoch 158 average loss: 0.2119
+EarlyStopping counter: 19 out of 50
+159/200 epoch 159, training loss: 0.2119, validation metric: 0.6989, validation loss: 0.2794 [=======================       ]
+epoch 159 average loss: 0.2148
+EarlyStopping counter: 20 out of 50
+160/200 epoch 160, training loss: 0.2148, validation metric: 0.7347, validation loss: 0.2478 [========================      ]
+epoch 160 average loss: 0.2056
+EarlyStopping counter: 21 out of 50
+161/200 epoch 161, training loss: 0.2056, validation metric: 0.7266, validation loss: 0.2553 [========================      ]
+epoch 161 average loss: 0.2041
+EarlyStopping counter: 22 out of 50
+162/200 epoch 162, training loss: 0.2041, validation metric: 0.7320, validation loss: 0.2516 [========================      ]
+epoch 162 average loss: 0.2037
+EarlyStopping counter: 23 out of 50
+163/200 epoch 163, training loss: 0.2037, validation metric: 0.7216, validation loss: 0.2611 [========================      ]
+epoch 163 average loss: 0.2035
+EarlyStopping counter: 24 out of 50
+164/200 epoch 164, training loss: 0.2035, validation metric: 0.7372, validation loss: 0.2469 [========================      ]
+epoch 164 average loss: 0.2028
+EarlyStopping counter: 25 out of 50
+165/200 epoch 165, training loss: 0.2028, validation metric: 0.7338, validation loss: 0.2484 [========================      ]
+epoch 165 average loss: 0.2021
+EarlyStopping counter: 26 out of 50
+166/200 epoch 166, training loss: 0.2021, validation metric: 0.7347, validation loss: 0.2478 [========================      ]
+epoch 166 average loss: 0.2043
+EarlyStopping counter: 27 out of 50
+167/200 epoch 167, training loss: 0.2043, validation metric: 0.7359, validation loss: 0.2467 [=========================     ]
+epoch 167 average loss: 0.2056
+EarlyStopping counter: 28 out of 50
+168/200 epoch 168, training loss: 0.2056, validation metric: 0.7276, validation loss: 0.2557 [=========================     ]
+epoch 168 average loss: 0.2048
+EarlyStopping counter: 29 out of 50
+169/200 epoch 169, training loss: 0.2048, validation metric: 0.7329, validation loss: 0.2508 [=========================     ]
+epoch 169 average loss: 0.2089
+EarlyStopping counter: 30 out of 50
+170/200 epoch 170, training loss: 0.2089, validation metric: 0.7345, validation loss: 0.2480 [=========================     ]
+epoch 170 average loss: 0.2163
+EarlyStopping counter: 31 out of 50
+171/200 epoch 171, training loss: 0.2163, validation metric: 0.7328, validation loss: 0.2496 [=========================     ]
+epoch 171 average loss: 0.2034
+EarlyStopping counter: 32 out of 50
+172/200 epoch 172, training loss: 0.2034, validation metric: 0.7371, validation loss: 0.2456 [=========================     ]
+epoch 172 average loss: 0.2040
+EarlyStopping counter: 33 out of 50
+173/200 epoch 173, training loss: 0.2040, validation metric: 0.7327, validation loss: 0.2496 [=========================     ]
+epoch 173 average loss: 0.2046
+EarlyStopping counter: 34 out of 50
+174/200 epoch 174, training loss: 0.2046, validation metric: 0.7344, validation loss: 0.2481 [==========================    ]
+epoch 174 average loss: 0.2006
+Validation loss decreased (0.245203 --> 0.243644).  Saving model ...
+175/200 epoch 175, training loss: 0.2006, validation metric: 0.7393, validation loss: 0.2436 [==========================    ]
+epoch 175 average loss: 0.2002
+EarlyStopping counter: 1 out of 50
+176/200 epoch 176, training loss: 0.2002, validation metric: 0.7388, validation loss: 0.2441 [==========================    ]
+epoch 176 average loss: 0.2002
+EarlyStopping counter: 2 out of 50
+177/200 epoch 177, training loss: 0.2002, validation metric: 0.7269, validation loss: 0.2550 [==========================    ]
+epoch 177 average loss: 0.2010
+EarlyStopping counter: 3 out of 50
+178/200 epoch 178, training loss: 0.2010, validation metric: 0.7363, validation loss: 0.2464 [==========================    ]
+epoch 178 average loss: 0.1992
+EarlyStopping counter: 4 out of 50
+179/200 epoch 179, training loss: 0.1992, validation metric: 0.7353, validation loss: 0.2473 [==========================    ]
+epoch 179 average loss: 0.2070
+EarlyStopping counter: 5 out of 50
+180/200 epoch 180, training loss: 0.2070, validation metric: 0.7356, validation loss: 0.2470 [===========================   ]
+epoch 180 average loss: 0.2070
+EarlyStopping counter: 6 out of 50
+181/200 epoch 181, training loss: 0.2070, validation metric: 0.7303, validation loss: 0.2518 [===========================   ]
+epoch 181 average loss: 0.2040
+EarlyStopping counter: 7 out of 50
+182/200 epoch 182, training loss: 0.2040, validation metric: 0.7351, validation loss: 0.2462 [===========================   ]
+epoch 182 average loss: 0.2001
+EarlyStopping counter: 8 out of 50
+183/200 epoch 183, training loss: 0.2001, validation metric: 0.7302, validation loss: 0.2533 [===========================   ]
+epoch 183 average loss: 0.1980
+EarlyStopping counter: 9 out of 50
+184/200 epoch 184, training loss: 0.1980, validation metric: 0.7371, validation loss: 0.2457 [===========================   ]
+epoch 184 average loss: 0.2003
+EarlyStopping counter: 10 out of 50
+185/200 epoch 185, training loss: 0.2003, validation metric: 0.7385, validation loss: 0.2444 [===========================   ]
+epoch 185 average loss: 0.1973
+EarlyStopping counter: 11 out of 50
+186/200 epoch 186, training loss: 0.1973, validation metric: 0.7296, validation loss: 0.2525 [===========================   ]
+epoch 186 average loss: 0.2004
+EarlyStopping counter: 12 out of 50
+187/200 epoch 187, training loss: 0.2004, validation metric: 0.7348, validation loss: 0.2478 [============================  ]
+epoch 187 average loss: 0.1968
+EarlyStopping counter: 13 out of 50
+188/200 epoch 188, training loss: 0.1968, validation metric: 0.7115, validation loss: 0.2679 [============================  ]
+epoch 188 average loss: 0.1992
+EarlyStopping counter: 14 out of 50
+189/200 epoch 189, training loss: 0.1992, validation metric: 0.7350, validation loss: 0.2476 [============================  ]
+epoch 189 average loss: 0.1964
+EarlyStopping counter: 15 out of 50
+190/200 epoch 190, training loss: 0.1964, validation metric: 0.7355, validation loss: 0.2471 [============================  ]
+epoch 190 average loss: 0.1957
+EarlyStopping counter: 16 out of 50
+191/200 epoch 191, training loss: 0.1957, validation metric: 0.7360, validation loss: 0.2466 [============================  ]
+epoch 191 average loss: 0.1974
+EarlyStopping counter: 17 out of 50
+192/200 epoch 192, training loss: 0.1974, validation metric: 0.7368, validation loss: 0.2460 [============================  ]
+epoch 192 average loss: 0.1972
+EarlyStopping counter: 18 out of 50
+193/200 epoch 193, training loss: 0.1972, validation metric: 0.7350, validation loss: 0.2476 [============================  ]
+epoch 193 average loss: 0.1986
+EarlyStopping counter: 19 out of 50
+194/200 epoch 194, training loss: 0.1986, validation metric: 0.7392, validation loss: 0.2437 [============================= ]
+epoch 194 average loss: 0.2046
+EarlyStopping counter: 20 out of 50
+195/200 epoch 195, training loss: 0.2046, validation metric: 0.7268, validation loss: 0.2564 [============================= ]
+epoch 195 average loss: 0.2110
+EarlyStopping counter: 21 out of 50
+196/200 epoch 196, training loss: 0.2110, validation metric: 0.7263, validation loss: 0.2543 [============================= ]
+epoch 196 average loss: 0.1994
+Validation loss decreased (0.243644 --> 0.242773).  Saving model ...
+197/200 epoch 197, training loss: 0.1994, validation metric: 0.7402, validation loss: 0.2428 [============================= ]
+epoch 197 average loss: 0.1985
+EarlyStopping counter: 1 out of 50
+198/200 epoch 198, training loss: 0.1985, validation metric: 0.7292, validation loss: 0.2530 [============================= ]
+epoch 198 average loss: 0.1978
+EarlyStopping counter: 2 out of 50
+199/200 epoch 199, training loss: 0.1978, validation metric: 0.7352, validation loss: 0.2478 [============================= ]
+epoch 199 average loss: 0.1952
+EarlyStopping counter: 3 out of 50
+200/200 epoch 200, training loss: 0.1952, validation metric: 0.7378, validation loss: 0.2449 [==============================]
+
+epoch 200 average loss: 0.2045
+EarlyStopping counter: 4 out of 50
+64244.4897942543
