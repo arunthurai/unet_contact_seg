@@ -8,9 +8,10 @@ sub-P001*
 sub-P002*
 electrode_masks/
 .ipynb_checkpoints
-.ipynb_checkpoints
+/.ipynb_checkpoints/
 monai_c3d_implementation/.ipynb_checkpoints
 preproc_contact_seg/preproc_contact_seg/.venv/
+preproc_contact_seg/preproc_contact_seg/.snakemake/*
 monai_c3d_implementation/.ipynb_checkpoints*
 data/
 *.nii.gz

@@ -153,7 +153,9 @@ def extract_coords(file_path):
     df = pd.read_csv(file_path, skiprows = 3, header = None)
     coord_arr = df[[1,2,3,11]].to_numpy()
     if any(x in coord_sys for x in {'LPS','1'}):
-        coord_arr = coord_arr[0:3] * np.array([-1,-1,1])
+        labels = coord_arr[:, 3]
+        coord_arr = coord_arr[:, :3] * np.array([-1,-1,1])
+        coord_arr = np.concatenate([coord_arr, labels.reshape(-1,1)], axis=1)
     return coord_arr
 
 def transform_coords_vox_space(scanner_coords, img_aff):
@@ -369,11 +371,12 @@ def create_electrode_mask(ct_data: np.ndarray, entry_target_vox: np.ndarray) -> 
 
     return merged_mask
 
-model_desc = 'Jun17_patch64_4layers_diceCE'
-pnms_dir = f'/scratch/athurai3/test_predictions/{model_desc}/prob_nms'
-patch_size = 'patch64'
+model_desc = 'Jun17_patch95_4layers_diceCE'
+pnms_dir = f'/scratch/athurai3/val_predictions/{model_desc}/prob_nms'
+patch_size = 'patch96'
 gt_dir = '/project/6050199/athurai3/seeg_data_final'
-test_dir = '/scratch/athurai3/test_thesis'
+# test_dir = '/project/6050199/athurai3/special_electrodes'
+# subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
 
 adtech_dict = dict(
     [(3,"RD10R-SP03X"), (4,"RD10R-SP04X"), (5,"RD10R-SP05X"), (6,"RD10R-SP06X"), (7,"RD10R-SP07X")]
@@ -382,7 +385,9 @@ adtech_dict = dict(
 
 subjects = []
 
-subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
+file_path = '/project/6050199/athurai3/unet_contact_seg/data_split_thesis/val_thesis.txt'
+with open(file_path, 'r') as file:
+    subjects = [line.strip() for line in file if line.strip()]
 
 print(subjects)
 print(sorted(subjects))
@@ -492,14 +497,19 @@ for sub in sorted(subjects):
         df_tmp = pd.DataFrame(t1_coords, columns=['x','y','z'])
         df_tmp['label_order'] = [f'{label}-{idx+1:02d}' for idx in range(found_contacts.shape[0])]
         print('Number of contacts found: ',  found_contacts.shape[0], '\n')
-        if found_contacts.shape[0] < 8:
-            print(f'{sub} Review', '\n')
-        if np.round(avg_distance) in adtech_dict.keys():
-            #print(adtech_dict[np.round(avg_distance)])
-            df_tmp['desc'] = adtech_dict[np.round(avg_distance)]
-        else:
-            df_tmp['desc'] = 'NA'
+        # if found_contacts.shape[0] < 8:
+        #     print(f'{sub} Review', '\n')
         
+        # elif found_contacts.shape[0] == 8 and np.round(avg_distance) == 5:
+        #     df_tmp['desc'] = 'MM16D-SPO5X'
+        # elif np.round(avg_distance, 2) == 3.5:
+        #     df_tmp['desc'] = 'DIXI'
+        # elif np.round(avg_distance) in adtech_dict.keys():
+        #     #print(adtech_dict[np.round(avg_distance)])
+        #     df_tmp['desc'] = adtech_dict[np.round(avg_distance)]
+        # else:
+        #     df_tmp['desc'] = 'NA'
+
         df_pos = pd.concat([df_pos, df_tmp])
         
     

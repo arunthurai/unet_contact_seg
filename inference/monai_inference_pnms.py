@@ -28,8 +28,8 @@ import glob
 import pandas as pd
 import numpy as np
 
-model_desc = 'Jun17_patch64_4layers_diceCE'
-model_fname = f'/project/6050199/athurai3/{model_desc}/checkpoint.pt'
+model_desc = 'Jun17_patch95_4layers_diceCE'
+model_fname = f'/project/6050199/athurai3/unet_contact_seg/{model_desc}/checkpoint.pt'
 
 def df_to_fcsv(input_df, output_fcsv):
     with open(output_fcsv, 'w') as fid:
@@ -75,13 +75,22 @@ model = UNet(
     norm=Norm.BATCH,
 ).to(device)
 
-test_dir = '/scratch/athurai3/test_thesis'
+#specify path for resampled images, model predictions
 orig_dir = '/scratch/athurai3/preproc_final'
-output_dir = '/scratch/athurai3/test_predictions'
+output_dir = '/scratch/athurai3/val_predictions'
 
-subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
+
+#identify which specific subjects to run model on
+# below - specify from organized directory
+# test_dir = '/project/6050199/athurai3/special_electrodes'
+# subjects = [identifier for identifier in os.listdir(test_dir) if "sub-" in identifier]
+
+# specify from txt file of subject names
+file_path = '/project/6050199/athurai3/unet_contact_seg/data_split_thesis/val_thesis.txt'
+with open(file_path, 'r') as file:
+    subjects = [line.strip() for line in file if line.strip()]
+
 subjects = sorted(subjects)
-# subjects = ['sub-P020']  #identify which specific subjects to run model on
 
 test_ct = []
 test_subjects = []
@@ -126,7 +135,7 @@ model.eval()
 with torch.no_grad():
     for i, test_img in enumerate(test_loader):
         test_inputs = test_img['image'].to(device)
-        roi_size = (64, 64, 64) #change to reflect patch size model was trained on
+        roi_size = (96, 96, 96) #change to reflect patch size model was trained on
         sw_batch_size = 8
         pred_img = sliding_window_inference(inputs = test_inputs, 
                                             roi_size=roi_size, 
@@ -151,7 +160,7 @@ if not os.path.exists(f'{output_dir}/{model_desc}/prob_nms'):
 
 
 #creating fcsv dataframes from prob_nms outputs to view in slicer
-patch_size = 'patch64'
+patch_size = 'patch96'
 
 for sub in range(len(pred_imgs)):
     pred_test_pnms = pred_imgs[sub]

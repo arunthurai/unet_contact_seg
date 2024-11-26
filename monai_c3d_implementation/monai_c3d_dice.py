@@ -58,7 +58,7 @@ TMP_DIR =  os.environ.get("SLURM_TMPDIR", "/tmp")
 fname_train = f'{TMP_DIR}/train_patches95.dat'
 fname_val = f'{TMP_DIR}/val_patches95.dat'
 
-model_desc="Jun17_patch95_4layers_diceCE" #  put current date if training, test if just testing
+model_desc="Aug21_patch95_4layers_diceCE" #  put current date if training, test if just testing
 
 if not os.path.exists(f'/scratch/athurai3/monai_outputs/UNET/{model_desc}'):
     os.makedirs(f'/scratch/athurai3/monai_outputs/UNET/{model_desc}')

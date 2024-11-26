@@ -23,55 +23,63 @@ wildcard_constraints:  **get_wildcard_constraints(config['pybids_inputs'])
 
 #---- end snakebids boilerplate ------------------------------------------------
 
-#take union of affine and rigid
-#affine_rigid_subjects = set(inputs['affine'].zip_lists['subject']) | set(inputs['rigid'].zip_lists['subject'])
-
-#intersect with other sets of subjects
-#subjects = affine_rigid_subjects & set(inputs['ct'].zip_lists['subject']) & set(inputs['landmarks_ct'].zip_lists['subject'])
 
 rule all:
     input:
-        thresh_ct = inputs['rigid'].expand(
+        orig_contact_mask = inputs['rigid'].expand(
             bids(
                 root=config['output_dir'],
-                suffix='thresh2500_ct.nii.gz',
-                res='{res}',
-                **inputs['rigid'].wildcards),
-                res=config['res_mm']
+                desc='contacts',
+                suffix='mask.nii.gz',
+            **inputs['rigid'].wildcards)
         ),
-        patches = inputs['rigid'].expand(
-            bids(
-                root=config['output_dir'],
-                suffix='patches31.dat',
-                res='{res}',
-                **inputs['rigid'].wildcards),
-                res=config['res_mm']
-        ),
-        patches_63 = inputs['rigid'].expand(
-            bids(
-                root=config['output_dir'],
-                suffix='patches63.dat',
-                res='{res}',
-                **inputs['rigid'].wildcards),
-                res=config['res_mm']
-        ),
-        patches_129 = inputs['rigid'].expand(
-            bids(
-                root=config['output_dir'],
-                suffix='patch129.dat',
-                res='{res}',
-                **inputs['rigid'].wildcards),
-                res=config['res_mm']
-        )
         
+        # patches_65 = inputs['rigid'].expand(
+        #     bids(
+        #         root=config['output_dir'],
+        #         suffix='norm_patches65.dat',
+        #         res='{res}',
+        #         **inputs['rigid'].wildcards),
+        #         res=config['res_mm']
+        # ),        
         
+        # patches_97 = inputs['rigid'].expand(
+        #     bids(
+        #         root=config['output_dir'],
+        #         suffix='norm_patches97.dat',
+        #         res='{res}',
+        #         **inputs['rigid'].wildcards),
+        #         res=config['res_mm']
+        # )
+
+# rule reslice_mask:
+#     input:
+#         mask =  inputs['mask'].path,
+#         ct = inputs['rig_ct'].path
+    
+#     output:
+#         resliced_mask = bids(
+#             root=config['output_dir'],
+#             space = 'T1w',
+#             suffix='resliced_brain_mask.nii.gz',
+#             **inputs['rigid'].wildcards
+#         )
+
+#     group: 'subj'
+    
+#     container:
+#         config["singularity"]["diffparc"]
+
+#     shell: 'c3d {input.ct} {input.mask} -reslice-identity -o {output.resliced_mask}'
+
+    
 rule resample:
     input:
         orig_ct =  inputs['ct'].path
     
     params:
         interpolation = 'Cubic',
-        dims = '0.4x0.4x0.4mm'
+        dims = '0.6x0.6x0.6mm'
     
     output:
         resampled_ct = bids(
@@ -123,7 +131,7 @@ rule transform_points_ct:
         transformed_points = np.dot(inv, points)
         np.savetxt(output.transformed_txt, transformed_points.T, fmt='%f')
 
-rule create_contact_mask:
+rule create_resampled_contact_mask:
     input: 
         landmarks = rules.transform_points_ct.output.transformed_txt,
         resampled_ct = rules.resample.output.resampled_ct
@@ -165,49 +173,69 @@ rule znormalize_ct:
     script: 
         './scripts/znormalize_ct.py'
 
-
-rule create_electrode_mask:
+rule create_orig_contact_mask:
     input: 
-        ct = rules.resample.output.resampled_ct,  
-        actual = inputs['actual'].path,
-        transform_matrix = inputs['rigid'].path,
+        landmarks = rules.transform_points_ct.output.transformed_txt,
+        ct = inputs['ct'].path
 
     output:
-        electrode_mask = bids(
+        contact_mask = bids(
             root=config['output_dir'],
-            desc='electrode',
-            res='{res}',
+            desc='contacts',
             suffix='mask.nii.gz',
             **inputs['rigid'].wildcards
         )
 
     group: 'subj'
-
-    resources:    
-        mem_mb = 32000
     
-    script: 
-        './scripts/electrode_mask_creation.py'
+    container:
+        config["singularity"]["diffparc"]
+    
+    shell: 'c3d {input.ct} -scale 0 -landmarks-to-spheres {input.landmarks} 1 -o {output.contact_mask}'
+
+
+# rule create_electrode_mask:
+#     input: 
+#         ct = rules.resample.output.resampled_ct,  
+#         actual = inputs['actual'].path,
+#         transform_matrix = inputs['rigid'].path,
+
+#     output:
+#         electrode_mask = bids(
+#             root=config['output_dir'],
+#             desc='electrode',
+#             res='{res}',
+#             suffix='mask.nii.gz',
+#             **inputs['rigid'].wildcards
+#         )
+
+#     group: 'subj'
+
+#     resources:    
+#         mem_mb = 32000
+    
+#     script: 
+#         './scripts/electrode_mask_creation.py'
 
 
 # rule create_patches:
 #     input:
-#         ct = rules.resample.output.resampled_ct,
-#         contact_mask = rules.create_contact_mask.output.contact_mask,
+#         ct = rules.znormalize_ct.output.znorm_ct,
+#         contact_mask = rules.create_resampled_contact_mask.output.contact_mask,
 #         electrode_mask = rules.create_electrode_mask.output.electrode_mask
 #         #will update to binary brain mask
     
 #     params:
-#         radius_vector = '47x47x47', #patch dimensions will be (x*2)+1 voxels
+#         radius_vector = '48x48x48', #patch dimensions will be (x*2)+1 voxels
 #         n = '2', #sample n randomly augment patches
 #         angle = '30', #stdev of normal distribution for sampling angle (in degrees)
 #         frequency = '14000' #sample 1 patch for every n voxels
 
 #     output:
-#         patches = bids(
+#         patches_97 = bids(
 #             root=config['output_dir'],
-#             suffix='patches95.dat',
 #             res='{res}',
+#             suffix='norm_patches97.dat',
 #             **inputs['rigid'].wildcards
 #         )
 
@@ -219,119 +247,36 @@ rule create_electrode_mask:
 #     container:
 #         config["singularity"]["diffparc"]
 
-#     shell: 'c3d {input.ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches} {params.radius_vector} {params.frequency}'
+#     shell: 'c3d {input.ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches_97} {params.radius_vector} {params.frequency}'
 
-rule create_patches_64:
-    input:
-        ct = rules.resample.output.resampled_ct,
-        contact_mask = rules.create_contact_mask.output.contact_mask,
-        electrode_mask = rules.create_electrode_mask.output.electrode_mask
-        #will update to binary brain mask
+# rule create_patches_64:
+#     input:
+#         ct = rules.znormalize_ct.output.znorm_ct,
+#         contact_mask = rules.create_resampled_contact_mask.output.contact_mask,
+#         electrode_mask = rules.create_electrode_mask.output.electrode_mask
+
+#         #will update to binary brain mask
     
-    params:
-        radius_vector = '31x31x31', #patch dimensions will be (x*2)+1 voxels
-        n = '2', #sample n randomly augment patches
-        angle = '30', #stdev of normal distribution for sampling angle (in degrees)
-        frequency = '12000' #sample 1 patch for every n voxels
-
-    output:
-        patches = bids(
-            root=config['output_dir'],
-            suffix='patches63.dat',
-            res='{res}',
-            **inputs['rigid'].wildcards
-        )
-
-    resources:    
-        mem_mb = 32000
-    
-    group: 'subj'
-
-    container:
-        config["singularity"]["diffparc"]
-
-    shell: 'c3d {input.ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches} {params.radius_vector} {params.frequency}'
-
-rule create_patches_32:
-    input:
-        ct = rules.resample.output.resampled_ct,
-        contact_mask = rules.create_contact_mask.output.contact_mask,
-        electrode_mask = rules.create_electrode_mask.output.electrode_mask
-        #will update to binary brain mask
-    
-    params:
-        radius_vector = '15x15x15', #patch dimensions will be (x*2)+1 voxels
-        n = '2', #sample n randomly augment patches
-        angle = '30', #stdev of normal distribution for sampling angle (in degrees)
-        frequency = '10000' #sample 1 patch for every n voxels
-
-    output:
-        patches = bids(
-            root=config['output_dir'],
-            suffix='patches31.dat',
-            res='{res}',
-            **inputs['rigid'].wildcards
-        )
-
-    resources:    
-        mem_mb = 32000
-    
-    group: 'subj'
-
-    container:
-        config["singularity"]["diffparc"]
-
-    shell: 'c3d {input.ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches} {params.radius_vector} {params.frequency}'
-
-rule create_patches_129:
-    input:
-        ct = rules.resample.output.resampled_ct,
-        contact_mask = rules.create_contact_mask.output.contact_mask,
-        electrode_mask = rules.create_electrode_mask.output.electrode_mask
-        #will update to binary brain mask
-    
-    params:
-        radius_vector = '64x64x64', #patch dimensions will be (x*2)+1 voxels
-        n = '2', #sample n randomly augment patches
-        angle = '30', #stdev of normal distribution for sampling angle (in degrees)
-        frequency = '27500' #sample 1 patch for every n voxels
-
-    output:
-        patches = bids(
-            root=config['output_dir'],
-            suffix='patch129.dat',
-            res='{res}',
-            **inputs['rigid'].wildcards
-        )
-
-    resources:    
-        mem_mb = 32000
-    
-    group: 'subj'
-
-    container:
-        config["singularity"]["diffparc"]
-
-    shell: 'c3d {input.ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches} {params.radius_vector} {params.frequency}'
-
-# rule thresh_ct:
-#     input: 
-#         ct = rules.resample.output.resampled_ct,
+#     params:
+#         radius_vector = '32x32x32', #patch dimensions will be (x*2)+1 voxels
+#         n = '2', #sample n randomly augment patches
+#         angle = '30', #stdev of normal distribution for sampling angle (in degrees)
+#         frequency = '12000' #sample 1 patch for every n voxels
 
 #     output:
-#         thresh = bids(
+#         patches_65 = bids(
 #             root=config['output_dir'],
 #             res='{res}',
-#             suffix='thresh2500_ct.nii.gz',
+#             suffix='norm_patches65.dat',
 #             **inputs['rigid'].wildcards
 #         )
 
-#     group: 'subj'
-
-#     resources:   
+#     resources:    
 #         mem_mb = 32000
+    
+#     group: 'subj'
 
 #     container:
 #         config["singularity"]["diffparc"]
-    
-#     shell: 'c3d {input.ct} -clip 2500 inf 1 0 {output.thresh}'
+
+#     shell: 'c3d {input.ct} {input.contact_mask} {input.electrode_mask} -xpa {params.n} {params.angle} -xp {output.patches_65} {params.radius_vector} {params.frequency}'

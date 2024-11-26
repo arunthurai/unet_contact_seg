@@ -10,4 +10,4 @@ source /project/6050199/athurai3/unet_contact_seg/preproc_contact_seg/preproc_co
 
 module load apptainer
 
-python /project/6050199/athurai3/unet_contact_seg/preproc_contact_seg/preproc_contact_seg/run.py '/project/6050199/athurai3/seeg_data_final' '/scratch/athurai3/preproc_final' participant --profile cc-slurm --verbose --singularity-args="-B /scratch/athurai3" -c4
+python /project/6050199/athurai3/unet_contact_seg/preproc_contact_seg/preproc_contact_seg/run.py '/project/6050199/athurai3/seeg_data_final' '/scratch/athurai3/preproc_seeg' participant --profile cc-slurm --verbose --singularity-args="-B /scratch/athurai3" -c4

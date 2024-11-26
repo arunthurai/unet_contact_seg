@@ -201,7 +201,7 @@ def create_electrode_mask(img_path, coord_path, ct_t1_trans, final_path):
 
 if __name__ == "__main__":
     create_electrode_mask(
-        img_path=snakemake.input['znorm_ct'],
+        img_path=snakemake.input['ct'],
         coord_path = snakemake.input['actual'],
         ct_t1_trans=snakemake.input['transform_matrix'],
         final_path=snakemake.output["electrode_mask"],

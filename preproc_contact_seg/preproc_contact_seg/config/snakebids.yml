@@ -1,5 +1,5 @@
 bids_dir: '/project/6050199/athurai3/seeg_data_final'
-output_dir: '/scratch/athurai3/preproc_final_2'
+output_dir: '/scratch/athurai3/preproc_seeg'
 
 #enable printing debug statements during parsing -- disable if generating dag visualization
 debug: False
@@ -22,9 +22,22 @@ targets_by_analysis_level:
 #    https://bids-standard.github.io/pybids/generated/bids.layout.BIDSLayout.html#bids.layout.BIDSLayout.get
 
 res_mm:
-  - '0p4mm'
+  - '0p6mm'
 
 pybids_inputs:
+  rig_ct:
+    filters:
+      suffix: 'ct'
+      session: 'post'
+      extension: 'nii.gz'
+      space: 'T1w'
+    wildcards:
+      - subject
+      - acquisition
+      - task
+      - run
+    custom_path: '/project/6050199/athurai3/seeg_data_final/sub-{subject}/sub-{subject}_space-T1w_desc-rigid_ses-post_ct.nii.gz'
+  
   ct:
     filters:
       suffix: 'ct'
@@ -36,7 +49,20 @@ pybids_inputs:
       - acquisition
       - task
       - run
-    #custom_path: '/scratch/athurai3/seeg_data/atlasreg/sub-{subject}/sub-{subject}_ct.nii.gz'
+    custom_path: '/project/6050199/athurai3/seeg_data_final/sub-{subject}/sub-{subject}_ses-post_ct.nii.gz'
+
+  mask:
+    filters:
+      suffix: 'mask'
+      extension: '.nii.gz'
+      space: False
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - task
+      - run
+    custom_path: '/project/6050199/athurai3/seeg_data_final/sub-{subject}/sub-{subject}_label-brain_desc-affine_from-MNI152NLin2009cSym_mask.nii.gz'
 
   landmarks:
     filters:
